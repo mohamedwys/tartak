@@ -21,7 +21,11 @@ export class UploadService {
     formData.append('image', file);
 
     return this.http.post<{ url: string }>(this.uploadUrl, formData, { headers: this.authHeaders().headers }).pipe(
-      map(response => ({ url: this.baseUrl + response.url }))
+      map(response => ({
+        // Absolute URLs (e.g. Supabase Storage public URLs) pass through; legacy
+        // relative paths are prefixed with the API host.
+        url: /^https?:\/\//i.test(response.url) ? response.url : this.baseUrl + response.url,
+      }))
     );
   }
 }
