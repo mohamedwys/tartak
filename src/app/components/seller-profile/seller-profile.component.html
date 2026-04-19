@@ -1,0 +1,123 @@
+<div class="profile-page">
+  <button (click)="router.navigate(['/'])" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back
+  </button>
+
+  <div *ngIf="loading" class="profile-skeleton">
+    <div class="sk-avatar-lg"></div>
+    <div class="sk-line" style="width:160px;height:20px;margin:12px auto 8px;"></div>
+    <div class="sk-line" style="width:100px;height:14px;margin:0 auto;"></div>
+  </div>
+
+  <p *ngIf="!loading && error" class="error-msg">{{ error }}</p>
+
+  <ng-container *ngIf="!loading && seller">
+    <!-- Seller hero -->
+    <div class="seller-hero">
+      <div class="seller-avatar-lg">{{ sellerInitials }}</div>
+      <h1 class="seller-name">{{ seller.name }}</h1>
+      <p class="seller-since">Member since {{ memberSince() }}</p>
+      <div class="seller-stats">
+        <div class="stat">
+          <span class="stat-num">{{ listings.length }}</span>
+          <span class="stat-label">listing{{ listings.length !== 1 ? 's' : '' }}</span>
+        </div>
+      </div>
+
+      <!-- Star rating display -->
+      <div *ngIf="ratingCount > 0" class="rating-summary">
+        <span class="stars-display">
+          <svg *ngFor="let i of stars(5)" width="16" height="16" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              [attr.fill]="i < (avgRating ?? 0) ? '#FF6B35' : '#e0e0e0'"
+              [attr.stroke]="i < (avgRating ?? 0) ? '#FF6B35' : '#ccc'"
+              stroke-width="1"/>
+          </svg>
+        </span>
+        <span class="rating-text">{{ avgRating?.toFixed(1) }} ({{ ratingCount }} review{{ ratingCount !== 1 ? 's' : '' }})</span>
+      </div>
+      <div *ngIf="ratingCount === 0 && !isOwnProfile" class="no-ratings">No ratings yet</div>
+    </div>
+
+    <!-- Listings grid -->
+    <div *ngIf="listings.length > 0" class="profile-listings">
+      <h2 class="section-heading">Listed items</h2>
+      <div class="listings-grid">
+        <div *ngFor="let item of listings" class="listing-card" (click)="openProduct(item._id)">
+          <div class="listing-img-wrap">
+            <img [src]="item.imageUrl" [alt]="item.name" class="listing-img" loading="lazy">
+          </div>
+          <div class="listing-info">
+            <div class="listing-price">{{ item.price | currency }}</div>
+            <div class="listing-name">{{ item.name }}</div>
+            <div class="listing-category">{{ item.category }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="listings.length === 0" class="no-listings">
+      <p>No active listings.</p>
+    </div>
+
+    <!-- Ratings section -->
+    <div *ngIf="ratings.length > 0" class="ratings-section">
+      <h2 class="section-heading">Reviews</h2>
+      <div *ngFor="let r of ratings" class="review-card">
+        <div class="review-header">
+          <div class="review-avatar">
+            <img *ngIf="r.reviewerId?.avatarUrl" [src]="r.reviewerId.avatarUrl" alt="" class="reviewer-img">
+            <span *ngIf="!r.reviewerId?.avatarUrl" class="reviewer-initials">
+              {{ r.reviewerId?.name ? r.reviewerId.name[0].toUpperCase() : '?' }}
+            </span>
+          </div>
+          <div class="review-meta">
+            <span class="reviewer-name">{{ r.reviewerId?.name ?? 'Anonymous' }}</span>
+            <span class="review-stars">
+              <svg *ngFor="let i of stars(5)" width="12" height="12" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                  [attr.fill]="i < r.stars ? '#FF6B35' : '#e0e0e0'"
+                  stroke="none"/>
+              </svg>
+            </span>
+          </div>
+          <span class="review-date">{{ r.createdAt | date:'mediumDate' }}</span>
+        </div>
+        <p *ngIf="r.comment" class="review-comment">{{ r.comment }}</p>
+      </div>
+    </div>
+
+    <!-- Leave a rating -->
+    <div *ngIf="!isOwnProfile && loggedInUserId" class="leave-rating">
+      <h2 class="section-heading">Leave a Review</h2>
+      <div *ngIf="!showRatingForm">
+        <button class="btn-rate" (click)="showRatingForm = true">Rate this seller</button>
+      </div>
+      <div *ngIf="showRatingForm" class="rating-form">
+        <div class="star-picker">
+          <button *ngFor="let i of [1,2,3,4,5]" class="star-pick-btn"
+            [class.selected]="i <= ratingStars"
+            (click)="ratingStars = i">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+        </div>
+        <textarea [(ngModel)]="ratingComment" rows="3" placeholder="Optional comment…" class="rating-textarea"></textarea>
+        <p *ngIf="ratingError" class="error-msg">{{ ratingError }}</p>
+        <p *ngIf="ratingSuccess" class="success-msg">{{ ratingSuccess }}</p>
+        <div class="form-actions">
+          <button (click)="showRatingForm = false" class="btn-cancel">Cancel</button>
+          <button (click)="submitRating()" [disabled]="submittingRating" class="btn-submit-rating">
+            {{ submittingRating ? 'Submitting…' : 'Submit Review' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

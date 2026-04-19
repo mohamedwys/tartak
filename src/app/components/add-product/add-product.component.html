@@ -1,0 +1,69 @@
+<div class="form-page">
+  <div class="form-inner">
+    <div class="form-header">
+      <a routerLink="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </a>
+      <h1>List an Item</h1>
+      <p class="form-sub">Fill in the details to create your listing</p>
+    </div>
+
+    <div class="form-layout">
+      <div class="form-card">
+        <div class="field">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="name" name="name" placeholder="e.g. iPhone 14 Pro — Space Black" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea [(ngModel)]="description" name="description" rows="4"
+            placeholder="Describe the condition, features, and anything else a buyer should know…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Price ($)</label>
+            <div class="price-input-wrap">
+              <span class="price-symbol">$</span>
+              <input type="number" [(ngModel)]="price" name="price" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select [(ngModel)]="category" name="category">
+              <option value="">Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Condition</label>
+            <select [(ngModel)]="condition" name="condition">
+              <option value="">Select condition</option>
+              <option *ngFor="let c of conditions" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Photos</label>
+          <!-- Primary photo -->
+          <app-image-upload (uploaded)="onPhotoUploaded($event)"></app-image-upload>
+          <!-- Additional photos -->
+          <div *ngFor="let url of imageUrls; let i = index; trackBy: trackByIndex" class="additional-photo">
+            <app-image-upload
+              [currentUrl]="url || undefined"
+              (uploaded)="imageUrls[i] = $event">
+            </app-image-upload>
+            <button type="button" class="btn-remove-photo" (click)="removePhoto(i)">Remove</button>
+          </div>
+          <button *ngIf="imageUrl" type="button" class="btn-add-photo" (click)="addPhotoSlot()">+ Add another photo</button>
+        </div>
+
+        <button (click)="addProduct()" [disabled]="submitting" class="btn-submit">
+          {{ submitting ? 'Publishing…' : 'Publish Listing' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="confirm-page">
+  <div class="confirm-card">
+    <div class="check-circle">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h1>Order Confirmed!</h1>
+    <p class="order-ref">Order #{{ shortId() }}</p>
+    <p class="message">
+      Thanks for your purchase. Your order has been placed and will be on its way soon.
+    </p>
+
+    <div class="confirm-actions">
+      <a routerLink="/orders" class="btn-primary">View My Orders</a>
+      <a routerLink="/" class="btn-secondary">Continue Shopping</a>
+    </div>
+  </div>
+</div>

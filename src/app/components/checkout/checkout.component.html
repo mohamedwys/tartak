@@ -1,0 +1,79 @@
+<div class="checkout-page">
+  <div class="checkout-inner">
+    <div class="checkout-header">
+      <a routerLink="/cart" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to cart
+      </a>
+      <h1>Checkout</h1>
+    </div>
+
+    <div class="checkout-layout">
+      <!-- Form -->
+      <div class="checkout-form-card">
+        <h2 class="section-title">Shipping Address</h2>
+
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="fullName" placeholder="Jane Smith" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Street Address</label>
+          <input type="text" [(ngModel)]="street" placeholder="123 Main St" autocomplete="street-address">
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>City</label>
+            <input type="text" [(ngModel)]="city" placeholder="New York" autocomplete="address-level2">
+          </div>
+          <div class="field">
+            <label>Postal Code</label>
+            <input type="text" [(ngModel)]="postalCode" placeholder="10001" autocomplete="postal-code">
+          </div>
+        </div>
+
+        <p *ngIf="error" class="error-msg">{{ error }}</p>
+
+        <button (click)="placeOrder()" [disabled]="submitting" class="btn-place-order">
+          <svg *ngIf="!submitting" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+              fill="currentColor"/>
+          </svg>
+          <span *ngIf="!submitting">Place Order · {{ total | currency }}</span>
+          <span *ngIf="submitting">Placing your order…</span>
+        </button>
+      </div>
+
+      <!-- Summary -->
+      <div class="order-summary-card">
+        <h2 class="section-title">Order Summary</h2>
+        <div class="summary-items">
+          <div *ngFor="let item of cartItems" class="summary-item">
+            <div class="summary-item-img-wrap">
+              <img [src]="item.imageUrl" [alt]="item.name" class="summary-item-img">
+              <span class="item-qty-badge">{{ item.quantity }}</span>
+            </div>
+            <span class="summary-item-name">{{ item.name }}</span>
+            <span class="summary-item-price">{{ (item.price * item.quantity) | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ total | currency }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span class="free">Free</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span>{{ total | currency }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

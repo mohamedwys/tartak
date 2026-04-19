@@ -1,0 +1,11 @@
+.status-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.status-box { max-width: 380px; width: 100%; text-align: center; padding: 40px; background: #fff; border: 1px solid #eee; border-radius: 8px; }
+.status-loading p { color: #888; font-size: 0.9rem; margin-top: 16px; }
+.spinner { width: 32px; height: 32px; border: 3px solid #eee; border-top-color: #FF6B35; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.status-icon { font-size: 2rem; font-weight: 900; margin-bottom: 12px; color: #0a8; }
+.status-icon.error { color: #c00; }
+.status-box h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+.status-box p { font-size: 0.9rem; color: #555; margin-bottom: 24px; }
+.btn-primary { display: inline-block; background: #222; color: #fff; padding: 10px 24px; text-decoration: none; font-size: 0.85rem; font-weight: 700; border-radius: 4px; }
+.btn-primary:hover { background: #000; }

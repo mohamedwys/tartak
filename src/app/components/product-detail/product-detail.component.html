@@ -1,0 +1,268 @@
+<div class="detail-page">
+
+  <!-- Back nav -->
+  <div class="detail-nav">
+    <a routerLink="/" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Browse
+    </a>
+    <button (click)="shareLink()" class="btn-share" title="Copy link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2"/>
+        <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+        <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button *ngIf="!isOwn && isLoggedIn" class="btn-report" (click)="openReport()" title="Report listing">
+      Report
+    </button>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div *ngIf="loading" class="detail-layout">
+    <div class="sk-image"></div>
+    <div class="sk-info">
+      <div class="sk-line" style="width:38%;height:32px;margin-bottom:14px;"></div>
+      <div class="sk-line" style="width:72%;height:22px;margin-bottom:10px;"></div>
+      <div class="sk-line" style="width:45%;height:14px;margin-bottom:28px;"></div>
+      <div class="sk-line" style="height:1px;margin-bottom:24px;"></div>
+      <div class="sk-line" style="height:90px;margin-bottom:16px;"></div>
+      <div class="sk-line" style="height:1px;margin-bottom:24px;"></div>
+      <div class="sk-line" style="height:68px;border-radius:12px;margin-bottom:16px;"></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading && error" class="detail-error">
+    <p>{{ error }}</p>
+    <a routerLink="/">Back to browse</a>
+  </div>
+
+  <!-- Product detail -->
+  <div *ngIf="!loading && product" class="detail-layout">
+
+    <!-- Left: image -->
+    <div class="detail-images">
+      <div class="main-image-wrap">
+        <img [src]="photos[activePhotoIndex]" [alt]="product.name" class="main-image">
+
+        <!-- Favorite button -->
+        <button class="btn-fav" [class.favorited]="isFavorited"
+          (click)="toggleFavorite()" [disabled]="togglingFav" title="Save to favorites">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+              [attr.fill]="isFavorited ? '#FF6B35' : 'none'"
+              [attr.stroke]="isFavorited ? '#FF6B35' : '#fff'"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div *ngIf="product.sold" class="sold-overlay">SOLD</div>
+
+        <!-- Prev/next arrows — only shown when >1 photo -->
+        <button *ngIf="photos.length > 1" class="carousel-btn carousel-prev" (click)="prevPhoto()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button *ngIf="photos.length > 1" class="carousel-btn carousel-next" (click)="nextPhoto()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Thumbnail strip — only shown when >1 photo -->
+      <div *ngIf="photos.length > 1" class="photo-thumbs">
+        <button *ngFor="let url of photos; let i = index"
+          class="thumb-btn" [class.active]="i === activePhotoIndex"
+          (click)="setPhoto(i)">
+          <img [src]="url" [alt]="product.name + ' photo ' + (i+1)">
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: info panel -->
+    <div class="detail-info">
+      <div class="detail-price-row">
+        <div class="detail-price">{{ product.price | currency }}</div>
+        <span *ngIf="product.condition" class="condition-badge">{{ product.condition }}</span>
+      </div>
+      <h1 class="detail-title">{{ product.name }}</h1>
+
+      <div class="detail-meta">
+        <span class="detail-category">{{ product.category }}</span>
+        <span class="detail-dot">·</span>
+        <span class="detail-date">{{ product.createdAt | date:'mediumDate' }}</span>
+        <ng-container *ngIf="product.views > 0">
+          <span class="detail-dot">·</span>
+          <span class="detail-views">{{ product.views }} view{{ product.views !== 1 ? 's' : '' }}</span>
+        </ng-container>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="detail-description">
+        <div class="section-label">Description</div>
+        <p>{{ product.description }}</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Seller card -->
+      <div *ngIf="seller" class="seller-card" (click)="openSellerProfile()">
+        <div class="seller-avatar">{{ sellerInitials }}</div>
+        <div class="seller-info">
+          <div class="seller-name">{{ seller.name }}</div>
+          <div class="seller-since">Member since {{ seller.createdAt | date:'MMM y' }}</div>
+          <span *ngIf="otherListings.length > 0" class="seller-other">
+            {{ otherListings.length }} other listing{{ otherListings.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+        <svg class="seller-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- CTA — not owner -->
+      <ng-container *ngIf="!isOwn">
+        <div *ngIf="product.sold" class="sold-notice">This item has been sold.</div>
+        <ng-container *ngIf="!product.sold">
+
+          <!-- Buttons row -->
+          <div *ngIf="!showMessageForm && !showOfferForm && !messageSent"
+            class="cta-row">
+            <button class="btn-message" (click)="openMessage()">
+              Message {{ sellerFirstName }}
+            </button>
+            <button class="btn-offer" (click)="openOffer()">Make Offer</button>
+          </div>
+
+          <!-- Message form -->
+          <div *ngIf="showMessageForm" class="inline-form">
+            <div class="section-label" style="margin-bottom:10px">Send a message</div>
+            <textarea [(ngModel)]="messageContent" rows="3"
+              placeholder="Hi! Is this still available?" class="inline-textarea"></textarea>
+            <p *ngIf="messageError" class="form-error">{{ messageError }}</p>
+            <div class="form-actions">
+              <button (click)="cancelMessage()" class="btn-cancel">Cancel</button>
+              <button (click)="sendMessage()" [disabled]="sendingMessage" class="btn-send-inline">
+                {{ sendingMessage ? 'Sending…' : 'Send message' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Offer form -->
+          <div *ngIf="showOfferForm" class="inline-form">
+            <div class="section-label" style="margin-bottom:10px">Make an offer</div>
+            <div class="offer-amount-wrap">
+              <span class="currency-symbol">$</span>
+              <input type="number" [(ngModel)]="offerAmount" placeholder="Your offer" min="1" step="1" class="offer-input">
+            </div>
+            <textarea [(ngModel)]="offerMessage" rows="2"
+              placeholder="Optional note to seller…" class="inline-textarea" style="margin-top:10px;"></textarea>
+            <p *ngIf="offerError" class="form-error">{{ offerError }}</p>
+            <div class="form-actions">
+              <button (click)="cancelOffer()" class="btn-cancel">Cancel</button>
+              <button (click)="sendOffer()" [disabled]="sendingOffer" class="btn-send-inline">
+                {{ sendingOffer ? 'Sending…' : 'Send offer' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Message sent confirmation -->
+          <div *ngIf="messageSent" class="sent-confirm">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Message sent!
+            <a routerLink="/inbox" class="view-inbox-link">View in inbox</a>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <!-- CTA — own listing -->
+      <div *ngIf="isOwn" class="own-listing-actions">
+        <a [routerLink]="['/edit-product', product._id]" class="btn-edit-listing">Edit listing</a>
+        <button *ngIf="!product.sold" (click)="markAsSold()" class="btn-mark-sold">Mark as Sold</button>
+        <button (click)="deleteListing()" class="btn-delete-listing">Delete</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- More from seller -->
+  <div *ngIf="!loading && otherListings.length > 0" class="more-from-seller">
+    <h2>More from {{ sellerFirstName }}</h2>
+    <div class="mini-grid">
+      <a *ngFor="let item of otherListings"
+        [routerLink]="['/product', item._id]" class="mini-card">
+        <img [src]="item.imageUrl" [alt]="item.name" class="mini-card-img" loading="lazy">
+        <div class="mini-card-info">
+          <div class="mini-card-price">{{ item.price | currency }}</div>
+          <div class="mini-card-name">{{ item.name }}</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Similar listings -->
+  <div *ngIf="!loading && similarListings.length > 0" class="similar-listings">
+    <h2>Similar listings</h2>
+    <div class="mini-grid">
+      <a *ngFor="let item of similarListings"
+        [routerLink]="['/product', item._id]" class="mini-card">
+        <img [src]="item.imageUrl" [alt]="item.name" class="mini-card-img" loading="lazy">
+        <div class="mini-card-info">
+          <div class="mini-card-price">{{ item.price | currency }}</div>
+          <div class="mini-card-name">{{ item.name }}</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Report modal -->
+  <div *ngIf="showReportModal" class="modal-backdrop" (click)="closeReport()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Report listing</h3>
+        <button class="modal-close" (click)="closeReport()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="!reportDone">
+        <p class="modal-desc">Why are you reporting this listing?</p>
+        <div class="report-reasons">
+          <label *ngFor="let r of reportReasons" class="reason-option">
+            <input type="radio" [(ngModel)]="reportReason" [value]="r.value" name="reportReason">
+            <span>{{ r.label }}</span>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button (click)="closeReport()" class="btn-modal-cancel">Cancel</button>
+          <button (click)="submitReport()" [disabled]="submittingReport" class="btn-modal-submit">
+            {{ submittingReport ? 'Sending…' : 'Submit Report' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="reportDone" class="report-thanks">
+        <p>Thank you for your report. We'll review this listing.</p>
+        <button (click)="closeReport()" class="btn-modal-submit">Done</button>
+      </div>
+    </div>
+  </div>
+
+</div>

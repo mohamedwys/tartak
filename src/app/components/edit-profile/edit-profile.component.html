@@ -1,0 +1,31 @@
+<div class="form-page">
+  <div class="form-inner">
+    <div class="form-header">
+      <a routerLink="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </a>
+      <h1>Edit Profile</h1>
+      <p class="form-sub">Update your public profile</p>
+    </div>
+
+    <div class="form-card">
+      <div class="field">
+        <label>Display Name</label>
+        <input type="text" [(ngModel)]="name" name="name" placeholder="Your name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Profile Photo <span class="field-hint">(optional)</span></label>
+        <app-image-upload [currentUrl]="avatarUrl" (uploaded)="avatarUrl = $event"></app-image-upload>
+      </div>
+      <p *ngIf="error" class="error-msg">{{ error }}</p>
+      <p *ngIf="success" class="success-msg">{{ success }}</p>
+      <button (click)="saveProfile()" [disabled]="submitting" class="btn-submit">
+        {{ submitting ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

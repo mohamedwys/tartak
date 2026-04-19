@@ -1,0 +1,55 @@
+<div class="inbox-page">
+  <div class="inbox-header">
+    <h1>Messages</h1>
+  </div>
+
+  <div *ngIf="loading" class="inbox-list">
+    <div *ngFor="let _ of [1,2,3,4,5]" class="thread-skeleton">
+      <div class="sk-avatar"></div>
+      <div class="sk-body">
+        <div class="sk-line" style="width:40%;height:14px;margin-bottom:8px;"></div>
+        <div class="sk-line" style="width:70%;height:12px;margin-bottom:6px;"></div>
+        <div class="sk-line" style="width:55%;height:11px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!loading && error" class="error-msg">{{ error }}</p>
+
+  <div *ngIf="!loading && threads.length === 0" class="empty-inbox">
+    <div class="empty-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+          stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>No messages yet</h3>
+    <p>When you message a seller or receive a message, it'll appear here.</p>
+    <a routerLink="/" class="btn-browse">Browse listings</a>
+  </div>
+
+  <div *ngIf="!loading && threads.length > 0" class="inbox-list">
+    <div *ngFor="let thread of threads"
+      class="thread-row" [class.unread]="thread.unreadCount > 0"
+      (click)="openConversation(thread)">
+
+      <img [src]="thread.product.imageUrl" [alt]="thread.product.name" class="thread-avatar">
+
+      <div class="thread-body">
+        <div class="thread-top">
+          <span class="thread-name">{{ thread.otherUser.name }}</span>
+          <span class="thread-time">{{ thread.lastMessage.createdAt | timeAgo }}</span>
+        </div>
+        <div class="thread-product">re: {{ thread.product.name }}</div>
+        <div class="thread-preview">{{ thread.lastMessage.content }}</div>
+      </div>
+
+      <div *ngIf="thread.unreadCount > 0" class="unread-badge">{{ thread.unreadCount }}</div>
+
+      <svg class="thread-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M9 18l6-6-6-6" stroke="#ccc" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</div>

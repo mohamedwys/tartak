@@ -1,0 +1,40 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-dot"></div>
+      <span>Marketplace</span>
+    </div>
+    <h1>Welcome back</h1>
+    <p class="auth-sub">Log in to your account</p>
+
+    <form (ngSubmit)="login()">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" [(ngModel)]="email" name="email"
+          placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" [(ngModel)]="password" name="password"
+          placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-auth">Log in</button>
+    </form>
+
+    <div class="forgot-link">
+      <a routerLink="/forgot-password">Forgot password?</a>
+    </div>
+
+    <p class="auth-switch">Don't have an account? <a routerLink="/register">Sign up</a></p>
+
+    <div class="demo-accounts">
+      <span class="demo-label">Try a demo account</span>
+      <div class="demo-btns">
+        <button type="button" class="btn-demo"
+          (click)="loginAsDemo('alex@demo.com', 'demo1234')">Alex Rivera</button>
+        <button type="button" class="btn-demo"
+          (click)="loginAsDemo('sam@demo.com', 'demo1234')">Sam Chen</button>
+      </div>
+    </div>
+  </div>
+</div>

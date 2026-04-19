@@ -1,0 +1,44 @@
+<header class="app-header">
+  <div class="header-inner">
+    <a routerLink="/" class="brand">
+      <div class="brand-mark"></div>
+      <span class="brand-name">TarTak</span>
+    </a>
+
+    <nav class="header-nav">
+      <a routerLink="/" class="nav-link" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}">Browse</a>
+
+      <ng-container *ngIf="isLoggedIn()">
+        <a routerLink="/inbox" class="nav-link nav-inbox" routerLinkActive="active">
+          Inbox
+          <span *ngIf="unreadCount > 0" class="inbox-badge">{{ unreadCount }}</span>
+        </a>
+        <a routerLink="/add-product" class="btn-sell">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Sell
+        </a>
+        <a [routerLink]="['/seller', myId]" class="btn-profile" title="My profile" routerLinkActive="active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <a routerLink="/profile/edit" class="btn-edit-profile" routerLinkActive="active">Edit profile</a>
+        <button (click)="logout()" class="btn-logout">Log out</button>
+      </ng-container>
+
+      <ng-container *ngIf="!isLoggedIn()">
+        <a routerLink="/login" class="btn-nav-login">Log in</a>
+        <a routerLink="/register" class="btn-nav-signup">Sign up</a>
+      </ng-container>
+    </nav>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>
+<app-toast></app-toast>

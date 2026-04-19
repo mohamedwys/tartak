@@ -1,0 +1,73 @@
+<div class="form-page">
+  <div class="form-inner">
+    <div class="form-header">
+      <a routerLink="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </a>
+      <h1>Edit Listing</h1>
+      <p class="form-sub">Update your listing details</p>
+    </div>
+
+    <div class="form-card">
+      <div *ngIf="error && !product.name" class="error-msg">{{ error }}</div>
+
+      <div class="field">
+        <label>Title</label>
+        <input type="text" [(ngModel)]="product.name" name="name" placeholder="Title" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea [(ngModel)]="product.description" name="description" rows="4" placeholder="Description"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Price ($)</label>
+          <div class="price-input-wrap">
+            <span class="price-symbol">$</span>
+            <input type="number" [(ngModel)]="product.price" name="price" placeholder="0.00" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select [(ngModel)]="product.category" name="category">
+            <option value="">Select a category</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Condition</label>
+          <select [(ngModel)]="product.condition" name="condition">
+            <option value="">Select condition</option>
+            <option *ngFor="let c of conditions" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Photos</label>
+        <!-- Primary photo -->
+        <app-image-upload
+          [currentUrl]="product.imageUrl"
+          (uploaded)="product.imageUrl = $event">
+        </app-image-upload>
+        <!-- Additional photos -->
+        <div *ngFor="let url of (product.imageUrls || []); let i = index; trackBy: trackByIndex" class="additional-photo">
+          <app-image-upload
+            [currentUrl]="url || undefined"
+            (uploaded)="product.imageUrls[i] = $event">
+          </app-image-upload>
+          <button type="button" class="btn-remove-photo" (click)="removePhoto(i)">Remove</button>
+        </div>
+        <button type="button" class="btn-add-photo" (click)="addPhotoSlot()">+ Add another photo</button>
+      </div>
+
+      <p *ngIf="error && product.name" class="error-msg">{{ error }}</p>
+
+      <button (click)="editProduct()" [disabled]="submitting" class="btn-submit">
+        {{ submitting ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

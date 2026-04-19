@@ -1,0 +1,70 @@
+<div class="convo-page">
+
+  <!-- Header -->
+  <div class="convo-header">
+    <button (click)="router.navigate(['/inbox'])" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div *ngIf="product" class="convo-product-info" [routerLink]="['/product', productId]">
+      <img [src]="product.imageUrl" [alt]="product.name" class="convo-product-thumb">
+      <div>
+        <div class="convo-product-name">{{ product.name }}</div>
+        <div class="convo-product-price">{{ product.price | currency }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="message-list" #messageList>
+    <div *ngIf="loading" class="chat-loading">Loading conversation…</div>
+    <p *ngIf="!loading && error" class="error-msg">{{ error }}</p>
+
+    <ng-container *ngFor="let msg of messages">
+
+      <!-- Offer message -->
+      <div *ngIf="msg.type === 'offer' && msg.offerRef"
+        class="offer-msg-wrap" [class.mine]="isMine(msg)">
+        <div class="offer-bubble">
+          <div class="offer-label">Price offer</div>
+          <div class="offer-amount">${{ msg.offerRef.amount | number }}</div>
+          <div *ngIf="msg.offerRef.message" class="offer-note">"{{ msg.offerRef.message }}"</div>
+
+          <div *ngIf="msg.offerRef.status === 'pending' && canRespondToOffer(msg)" class="offer-actions">
+            <button (click)="respondToOffer(msg, 'accepted')" class="btn-accept">Accept</button>
+            <button (click)="respondToOffer(msg, 'declined')" class="btn-decline">Decline</button>
+          </div>
+
+          <div *ngIf="msg.offerRef.status !== 'pending'" class="offer-status-badge"
+            [class.accepted]="msg.offerRef.status === 'accepted'">
+            {{ msg.offerRef.status }}
+          </div>
+        </div>
+        <div class="message-time">{{ msg.createdAt | timeAgo }}</div>
+      </div>
+
+      <!-- Regular text message -->
+      <div *ngIf="msg.type !== 'offer' || !msg.offerRef"
+        class="message-bubble-wrap" [class.mine]="isMine(msg)">
+        <div class="message-bubble">{{ msg.content }}</div>
+        <div class="message-time">{{ msg.createdAt | timeAgo }}</div>
+      </div>
+
+    </ng-container>
+  </div>
+
+  <!-- Input -->
+  <div class="convo-input-bar">
+    <textarea [(ngModel)]="content" (keydown)="onKey($event)"
+      placeholder="Message…" rows="1" class="convo-textarea"></textarea>
+    <button (click)="send()" [disabled]="!content.trim() || sending" class="btn-send">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>

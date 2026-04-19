@@ -1,0 +1,50 @@
+<div class="orders-page">
+  <div class="orders-inner">
+    <h1 class="page-title">My Orders</h1>
+
+    <div *ngIf="loading" class="orders-list">
+      <div *ngFor="let _ of [1,2,3]" class="skeleton-order">
+        <div class="skeleton-line wide"></div>
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-thumbs">
+          <div *ngFor="let __ of [1,2,3]" class="skeleton-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && error" class="state-msg error-msg">{{ error }}</div>
+
+    <div *ngIf="!loading && !error && orders.length === 0" class="empty-orders">
+      <div class="empty-icon">📦</div>
+      <h3>No orders yet</h3>
+      <p>When you place an order it will appear here.</p>
+      <a routerLink="/" class="btn-shop">Browse Marketplace</a>
+    </div>
+
+    <div *ngIf="!loading && !error && orders.length > 0" class="orders-list">
+      <div *ngFor="let order of orders" class="order-card">
+        <div class="order-card-top">
+          <div class="order-id-wrap">
+            <span class="order-label">Order</span>
+            <span class="order-id">#{{ shortId(order._id) }}</span>
+          </div>
+          <span class="order-status-badge">{{ order.status }}</span>
+        </div>
+
+        <div class="order-date">{{ order.createdAt | date:'MMMM d, y' }}</div>
+
+        <div class="order-thumbnails">
+          <img *ngFor="let item of order.items.slice(0, 4)"
+            [src]="item.imageUrl || 'https://placehold.co/56x56/f3f4f6/9ca3af?text=?'"
+            [alt]="item.name" class="order-thumb">
+          <div *ngIf="order.items.length > 4" class="more-items">+{{ order.items.length - 4 }}</div>
+        </div>
+
+        <div class="order-card-footer">
+          <span class="item-count">{{ order.items.length }} item{{ order.items.length !== 1 ? 's' : '' }}</span>
+          <span class="order-total">{{ order.total | currency }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
