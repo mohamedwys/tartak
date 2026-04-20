@@ -216,6 +216,103 @@
 .btn-edit-profile:hover,
 .btn-edit-profile.active { background: var(--bg); color: var(--text); }
 
+/* Account dropdown */
+.account-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.btn-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  max-width: 160px;
+  font-family: inherit;
+}
+.btn-account:hover { border-color: var(--text-muted); }
+.account-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 6px;
+  z-index: 200;
+}
+
+.dropdown-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 8px 10px 4px;
+}
+
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.dropdown-item:hover { background: var(--bg); }
+.dropdown-item.active {
+  background: rgba(255,101,52,0.08);
+  color: var(--primary-dark, var(--primary));
+}
+.item-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-meta {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 4px;
+}
+
+.dropdown-action {
+  color: var(--primary);
+  font-weight: 700;
+  justify-content: flex-start;
+}
+
 @media (max-width: 600px) {
   .header-inner { padding: 0 16px; gap: 8px; }
   .brand-name { font-size: 1rem; }
@@ -224,6 +321,8 @@
   .btn-logout { padding: 5px 10px; font-size: 0.8rem; }
   .btn-nav-login, .btn-nav-signup { padding: 6px 10px; font-size: 0.85rem; }
   .btn-edit-profile { display: none; }
+  .btn-account { max-width: 110px; padding: 5px 8px; font-size: 0.8rem; }
+  .account-label { max-width: 72px; }
 }
 
 @media (max-width: 420px) {

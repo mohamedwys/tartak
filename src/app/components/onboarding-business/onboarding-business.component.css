@@ -1,0 +1,87 @@
+.form-page { min-height: 100vh; background: #fafafa; padding: 32px 20px; }
+.form-inner { max-width: 620px; margin: 0 auto; }
+.form-header { margin-bottom: 24px; }
+.form-header h1 { font-size: 1.5rem; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.02em; }
+.form-sub { font-size: 0.9rem; color: #666; margin: 0; }
+
+.form-card {
+  background: #fff;
+  border: 1px solid var(--border, #eee);
+  border-radius: var(--radius, 10px);
+  padding: 28px;
+  box-shadow: var(--shadow, 0 1px 3px rgba(0,0,0,.05));
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.field label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #222;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.field input,
+.field textarea {
+  border: 1.5px solid var(--border, #ddd);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border-radius: var(--radius-sm, 6px);
+  outline: none;
+  font-family: inherit;
+  background: #fff;
+  color: #222;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--primary, #FF6B35);
+  box-shadow: 0 0 0 3px rgba(255,101,52,0.08);
+}
+.field-hint { font-weight: 400; font-size: 0.75rem; color: #aaa; text-transform: none; letter-spacing: 0; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.radio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border, #ddd);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #444;
+  user-select: none;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.radio-chip input { accent-color: var(--primary, #FF6B35); margin: 0; }
+.radio-chip:has(input:checked) {
+  border-color: var(--primary, #FF6B35);
+  background: rgba(255,101,52,0.06);
+  color: var(--primary-dark, #d64a16);
+  font-weight: 700;
+}
+
+.btn-submit {
+  width: 100%;
+  background: var(--primary, #FF6B35);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px);
+  transition: background .15s;
+}
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+.btn-submit:hover:not(:disabled) { background: var(--primary-dark, #d64a16); }

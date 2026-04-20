@@ -23,6 +23,10 @@
         <input type="password" id="password" [(ngModel)]="password" name="password"
           placeholder="Min. 6 characters" required autocomplete="new-password">
       </div>
+      <label class="biz-toggle">
+        <input type="checkbox" [(ngModel)]="isBusiness" name="isBusiness">
+        <span>I'm signing up as a business</span>
+      </label>
       <button type="submit" class="btn-auth">Sign up</button>
     </form>
 

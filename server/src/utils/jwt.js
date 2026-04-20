@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 
-export function signAuthToken(user) {
+export function signAuthToken(user, currentOrgId = null) {
   return jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, currentOrgId: currentOrgId ?? null },
     env.jwtSecret,
     { expiresIn: env.jwtExpiresIn },
   );

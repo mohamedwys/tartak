@@ -1,0 +1,69 @@
+<div class="form-page">
+  <div class="form-inner">
+    <div class="form-header">
+      <h1>Set up your business account</h1>
+      <p class="form-sub">Tell us a bit about your organization. You can update these details any time.</p>
+    </div>
+
+    <form class="form-card" (ngSubmit)="submit()">
+      <div class="field">
+        <label>Organization name</label>
+        <input type="text" [(ngModel)]="name" name="name" placeholder="Acme Supplies" required>
+      </div>
+
+      <div class="field">
+        <label>Business type</label>
+        <div class="radio-row">
+          <label class="radio-chip">
+            <input type="radio" name="type" value="b2c" [(ngModel)]="type">
+            <span>B2C — sell to consumers</span>
+          </label>
+          <label class="radio-chip">
+            <input type="radio" name="type" value="b2b" [(ngModel)]="type">
+            <span>B2B — sell to businesses</span>
+          </label>
+          <label class="radio-chip">
+            <input type="radio" name="type" value="both" [(ngModel)]="type">
+            <span>Both</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Tax ID <span class="field-hint">(optional)</span></label>
+          <input type="text" [(ngModel)]="taxId" name="taxId" placeholder="VAT / EIN / GSTIN">
+        </div>
+        <div class="field">
+          <label>Phone <span class="field-hint">(optional)</span></label>
+          <input type="tel" [(ngModel)]="phone" name="phone" placeholder="+1 555-0100">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Billing address <span class="field-hint">(optional)</span></label>
+        <input type="text" [(ngModel)]="street" name="street" placeholder="Street">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <input type="text" [(ngModel)]="city" name="city" placeholder="City">
+        </div>
+        <div class="field">
+          <input type="text" [(ngModel)]="country" name="country" placeholder="Country">
+        </div>
+        <div class="field">
+          <input type="text" [(ngModel)]="postal" name="postal" placeholder="Postal code">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tell customers about your business <span class="field-hint">(optional)</span></label>
+        <textarea [(ngModel)]="bio" name="bio" rows="4" placeholder="We make sustainable office supplies for small teams…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="submitting">
+        {{ submitting ? 'Creating…' : 'Create business account' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -18,8 +18,60 @@ export function toUserProfile(row, stats = {}) {
     ...toUserPublic(row),
     email: row.email,
     emailVerified: row.email_verified,
+    accountType: row.account_type ?? 'individual',
+    currentOrgId: row.current_org_id ?? null,
     avgRating: stats.avgRating ?? null,
     ratingCount: stats.ratingCount ?? 0,
+  };
+}
+
+export function toOrganization(row, extra = {}) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    name: row.name,
+    slug: row.slug,
+    type: row.type,
+    kybStatus: row.kyb_status,
+    taxId: row.tax_id ?? null,
+    billingAddress: row.billing_address ?? null,
+    logoUrl: row.logo_url ?? null,
+    coverUrl: row.cover_url ?? null,
+    bio: row.bio ?? null,
+    website: row.website ?? null,
+    supportEmail: row.support_email ?? null,
+    // Phone lives inside billing_address.phone since organizations has no
+    // dedicated phone column; surfaced here for convenience.
+    phone: row.billing_address?.phone ?? null,
+    memberCount: extra.memberCount,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function toOrgMember(row, user) {
+  if (!row) return null;
+  return {
+    orgId: row.org_id,
+    userId: row.user_id,
+    role: row.role,
+    invitedAt: row.invited_at,
+    acceptedAt: row.accepted_at ?? null,
+    status: row.accepted_at ? 'accepted' : 'pending',
+    user: user ? toUserPublic(user) : null,
+    email: user?.email ?? null,
+  };
+}
+
+export function toInvitation(row, user) {
+  if (!row) return null;
+  return {
+    orgId: row.org_id,
+    userId: row.user_id,
+    role: row.role,
+    invitedAt: row.invited_at,
+    user: user ? toUserPublic(user) : null,
+    email: user?.email ?? null,
   };
 }
 

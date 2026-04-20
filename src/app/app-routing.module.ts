@@ -13,6 +13,7 @@ import { EditProfileComponent } from './components/edit-profile/edit-profile.com
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -29,6 +30,7 @@ const routes: Routes = [
   { path: 'verify-email',                  component: VerifyEmailComponent },
   { path: 'forgot-password',               component: ForgotPasswordComponent },
   { path: 'reset-password/:token',         component: ResetPasswordComponent },
+  { path: 'onboarding/business',           component: OnboardingBusinessComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

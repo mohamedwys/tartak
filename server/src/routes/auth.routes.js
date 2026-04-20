@@ -26,6 +26,9 @@ const profileUpdateSchema = z.object({
 });
 const forgotSchema = z.object({ email: z.string().trim().toLowerCase().email() });
 const resetSchema  = z.object({ password: z.string().min(6).max(200) });
+const switchOrgSchema = z.object({
+  orgId: z.string().uuid().nullable(),
+});
 
 // POST /api/user/register
 router.post('/register', asyncHandler(async (req, res) => {
@@ -62,7 +65,35 @@ router.post('/login', asyncHandler(async (req, res) => {
   const ok = await bcrypt.compare(password, user.password_hash);
   if (!ok) throw new HttpError(401, 'Invalid credentials');
 
-  const token = signAuthToken(user);
+  const token = signAuthToken(user, user.current_org_id ?? null);
+  res.json({ token, user: toUserProfile(user) });
+}));
+
+// POST /api/user/switch-org — change active org context; re-issues JWT
+router.post('/switch-org', requireAuth, asyncHandler(async (req, res) => {
+  const { orgId } = switchOrgSchema.parse(req.body);
+
+  if (orgId !== null) {
+    const { data: membership } = await supabase
+      .from('org_members')
+      .select('org_id, accepted_at')
+      .eq('org_id', orgId)
+      .eq('user_id', req.user.id)
+      .maybeSingle();
+    if (!membership || !membership.accepted_at) {
+      throw new HttpError(403, 'Not a member of that organization');
+    }
+  }
+
+  const { data: user, error } = await supabase
+    .from('users')
+    .update({ current_org_id: orgId })
+    .eq('id', req.user.id)
+    .select('*')
+    .single();
+  if (error) throw error;
+
+  const token = signAuthToken(user, orgId);
   res.json({ token, user: toUserProfile(user) });
 }));
 

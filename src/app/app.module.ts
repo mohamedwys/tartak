@@ -18,6 +18,7 @@ import { EditProfileComponent } from './components/edit-profile/edit-profile.com
 import { VerifyEmailComponent } from './components/verify-email/verify-email.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
@@ -39,6 +40,7 @@ import { AuthGuard } from './guards/auth.guard';
     VerifyEmailComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    OnboardingBusinessComponent,
     ToastComponent,
     ImageUploadComponent,
     TimeAgoPipe,

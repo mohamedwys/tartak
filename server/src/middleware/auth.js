@@ -9,7 +9,11 @@ export function requireAuth(req, _res, next) {
   }
   try {
     const payload = verifyAuthToken(token);
-    req.user = { id: payload.id, email: payload.email };
+    req.user = {
+      id: payload.id,
+      email: payload.email,
+      currentOrgId: payload.currentOrgId ?? null,
+    };
     next();
   } catch {
     next(new HttpError(401, 'Invalid or expired token'));
@@ -22,7 +26,11 @@ export function optionalAuth(req, _res, next) {
   if (scheme === 'Bearer' && token) {
     try {
       const payload = verifyAuthToken(token);
-      req.user = { id: payload.id, email: payload.email };
+      req.user = {
+        id: payload.id,
+        email: payload.email,
+        currentOrgId: payload.currentOrgId ?? null,
+      };
     } catch {
       /* ignore — treat as anonymous */
     }

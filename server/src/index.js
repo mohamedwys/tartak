@@ -21,6 +21,7 @@ import ratingsRoutes   from './routes/ratings.routes.js';
 import reportsRoutes   from './routes/reports.routes.js';
 import ordersRoutes    from './routes/orders.routes.js';
 import uploadRoutes    from './routes/upload.routes.js';
+import orgsRoutes      from './routes/orgs.routes.js';
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use('/api/ratings',   ratingsRoutes);
 app.use('/api/reports',   reportsRoutes);
 app.use('/api/orders',    ordersRoutes);
 app.use('/api/upload',    uploadRoutes);
+app.use('/api/orgs',      orgsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
