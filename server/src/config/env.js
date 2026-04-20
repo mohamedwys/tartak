@@ -40,4 +40,14 @@ export const env = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
 
   appUrl: process.env.APP_URL ?? 'http://localhost:4200',
+
+  // ---- Stripe (optional until billing is enabled) ----
+  // The app boots fine without these, but the /api/billing routes throw a
+  // 503 "Billing is not configured" on any caller if the relevant keys are
+  // missing. Fallbacks for Price IDs are used when the catalog row's
+  // `stripe_price_id` column is still null.
+  stripeSecretKey:            process.env.STRIPE_SECRET_KEY ?? '',
+  stripeWebhookSecret:        process.env.STRIPE_WEBHOOK_SECRET ?? '',
+  stripePriceIdPro:           process.env.STRIPE_PRICE_ID_PRO ?? '',
+  stripePriceIdHomepageFeature: process.env.STRIPE_PRICE_ID_HOMEPAGE_FEATURE ?? '',
 };

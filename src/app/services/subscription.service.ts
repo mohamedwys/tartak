@@ -43,6 +43,7 @@ export interface OrgSubscriptionResponse {
     startedAt: string;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
+    hasBillingProfile: boolean;
   };
   usage: {
     activeListings: number;
@@ -57,6 +58,7 @@ export interface OrgAddon {
   startedAt: string;
   endsAt: string | null;
   productId: string | null;
+  isActive?: boolean;
 }
 
 // Plain string because Intl.NumberFormat doesn't ship a MAD symbol on

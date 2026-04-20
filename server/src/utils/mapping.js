@@ -227,7 +227,9 @@ export function toAddonService(row) {
 }
 
 // Intentionally omits stripe_customer_id / stripe_subscription_id —
-// those are server-only and must never leak to the frontend.
+// those are server-only and must never leak to the frontend. We do
+// expose `hasBillingProfile` as a boolean so the UI can decide whether
+// the "Manage billing" button is meaningful yet.
 export function toOrgSubscription(row) {
   if (!row) return null;
   return {
@@ -235,6 +237,7 @@ export function toOrgSubscription(row) {
     startedAt: row.started_at,
     currentPeriodEnd: row.current_period_end ?? null,
     cancelAtPeriodEnd: !!row.cancel_at_period_end,
+    hasBillingProfile: !!row.stripe_customer_id,
   };
 }
 

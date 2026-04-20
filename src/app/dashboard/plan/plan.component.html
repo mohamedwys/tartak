@@ -17,11 +17,28 @@
         </div>
         <div class="plan-banner-meta">
           Active since {{ current.subscription.startedAt | date:'mediumDate' }}
+          <ng-container *ngIf="current.subscription.currentPeriodEnd">
+            · renews {{ current.subscription.currentPeriodEnd | date:'mediumDate' }}
+          </ng-container>
+          <ng-container *ngIf="current.subscription.cancelAtPeriodEnd">
+            · cancels at period end
+          </ng-container>
         </div>
       </div>
-      <span class="plan-chip" [attr.data-status]="current.subscription.status">
-        {{ current.subscription.status }}
-      </span>
+      <div class="plan-banner-side">
+        <span class="plan-chip" [attr.data-status]="current.subscription.status">
+          {{ current.subscription.status }}
+        </span>
+        <button
+          *ngIf="canManageBilling"
+          type="button"
+          class="plan-btn plan-btn-ghost plan-btn-inline"
+          (click)="onManageBilling()"
+          [disabled]="!!busy"
+        >
+          {{ busyEquals('portal') ? 'Opening…' : 'Manage billing' }}
+        </button>
+      </div>
     </section>
 
     <!-- ── Usage meter ──────────────────────────────────────── -->
@@ -99,15 +116,25 @@
             </li>
           </ul>
           <button
+            *ngIf="currentPlanSlug !== 'pro'; else proCurrentBtn"
             type="button"
             class="plan-btn plan-btn-primary"
-            [disabled]="true"
+            [disabled]="!!busy"
+            (click)="onUpgradeToPro()"
           >
-            {{ currentPlanSlug === 'pro'
-              ? 'Your plan'
+            {{ busyEquals('upgrade')
+              ? 'Redirecting…'
               : 'Upgrade to Pro — ' + planBlurb(proPlan) }}
           </button>
-          <p class="plan-btn-help" *ngIf="currentPlanSlug !== 'pro'">{{ comingSoon }}</p>
+          <ng-template #proCurrentBtn>
+            <button
+              type="button"
+              class="plan-btn plan-btn-primary"
+              [disabled]="true"
+            >
+              Your plan
+            </button>
+          </ng-template>
         </article>
       </div>
     </section>
@@ -124,10 +151,15 @@
           <div class="plan-addon-name">{{ addon.name }}</div>
           <div class="plan-addon-price">{{ addonBlurb(addon) }}</div>
           <p class="plan-addon-desc" *ngIf="addon.description">{{ addon.description }}</p>
-          <button type="button" class="plan-btn plan-btn-secondary" [disabled]="true">
-            Add
+          <button
+            type="button"
+            class="plan-btn plan-btn-secondary"
+            [disabled]="isAddonDisabled(addon)"
+            (click)="onAddAddon(addon)"
+          >
+            {{ busyEquals('addon:' + addon.slug) ? 'Redirecting…' : 'Add' }}
           </button>
-          <p class="plan-btn-help">{{ comingSoon }}</p>
+          <p class="plan-btn-help" *ngIf="addonDisabledHint(addon)">{{ addonDisabledHint(addon) }}</p>
         </article>
       </div>
     </section>

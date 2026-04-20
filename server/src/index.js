@@ -26,6 +26,7 @@ import storefrontsRoutes from './routes/storefronts.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
 import homeRoutes       from './routes/home.routes.js';
 import { plansRouter, addonsRouter } from './routes/subscriptions.routes.js';
+import billingRouter, { webhookHandler } from './routes/billing.routes.js';
 
 const app = express();
 
@@ -36,6 +37,17 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(corsMiddleware);
 app.use(httpLogger);
+
+// Stripe webhook MUST receive the raw request body so signature
+// verification can hash it. Mount this before the JSON parser — once
+// express.json() consumes the body stream, stripe.webhooks.constructEvent
+// rejects the request with "No signatures found matching the expected".
+app.post(
+  '/api/billing/webhook',
+  express.raw({ type: 'application/json' }),
+  webhookHandler,
+);
+
 app.use(express.json({ limit: '2mb' }));
 
 app.use(globalLimiter);
@@ -70,6 +82,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/home',       homeRoutes);
 app.use('/api/subscription-plans', plansRouter);
 app.use('/api/addon-services',     addonsRouter);
+app.use('/api/billing',            billingRouter);
 
 app.use(notFound);
 app.use(errorHandler);

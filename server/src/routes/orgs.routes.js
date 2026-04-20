@@ -863,19 +863,31 @@ router.get(
 
 // GET /api/orgs/:id/addons — agent+. Active add-ons only; expired /
 // cancelled rows are hidden from this endpoint since the UI treats them
-// as gone. Billing history will live on a separate endpoint later.
+// as gone. Expiry is enforced at query time (`ends_at > now()`) rather
+// than via a scheduled job — simpler, and adequate for MVP volumes.
 router.get(
   '/:id/addons',
   requireOrgRole('agent'),
   asyncHandler(async (req, res) => {
+    const nowIso = new Date().toISOString();
     const { data, error } = await supabase
       .from('org_addons')
       .select('*')
       .eq('org_id', req.params.id)
       .eq('status', 'active')
+      // Null ends_at means evergreen — keep it. Non-null must still be
+      // in the future; otherwise the row is effectively expired and
+      // shouldn't surface on the Plan page.
+      .or(`ends_at.is.null,ends_at.gt.${nowIso}`)
       .order('started_at', { ascending: false });
     if (error) throw error;
-    res.json((data ?? []).map(toOrgAddon));
+
+    const rows = (data ?? []).map((row) => {
+      const mapped = toOrgAddon(row);
+      mapped.isActive = !row.ends_at || new Date(row.ends_at) > new Date();
+      return mapped;
+    });
+    res.json(rows);
   }),
 );
 

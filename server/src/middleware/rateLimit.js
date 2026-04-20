@@ -37,3 +37,13 @@ export const storefrontReadLimiter = makeLimiter({
   max: 300,
   message: 'Too many storefront requests. Please slow down.',
 });
+
+// Per-user (falls back to IP) cap for checkout/portal endpoints. Keeps a
+// misbehaving client from spamming Stripe Session creation. The webhook
+// receiver is deliberately NOT limited — Stripe retries on rejection.
+export const billingLimiter = makeLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 20,
+  keyGenerator: (req) => req.user?.id ?? ipKeyGenerator(req.ip),
+  message: 'Too many billing requests. Please try again in a few minutes.',
+});
