@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../services/auth.service';
+import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
   selector: 'app-inbox',
@@ -30,9 +31,7 @@ export class InboxComponent implements OnInit {
   }
 
   private getMyId(): string {
-    const token = localStorage.getItem('token');
-    if (!token) return '';
-    try { return JSON.parse(atob(token.split('.')[1])).id; } catch { return ''; }
+    return decodeJwtPayload<{ id?: string }>(localStorage.getItem('token'))?.id ?? '';
   }
 
   openConversation(thread: any): void {

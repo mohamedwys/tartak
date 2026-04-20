@@ -5,6 +5,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 import { ProductService } from '../../services/product.service';
 import { RatingService } from '../../services/rating.service';
 import { AuthService } from '../../services/auth.service';
+import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
   selector: 'app-seller-profile',
@@ -43,10 +44,8 @@ export class SellerProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try { this.loggedInUserId = JSON.parse(atob(token.split('.')[1])).id; } catch {}
-    }
+    this.loggedInUserId =
+      decodeJwtPayload<{ id?: string }>(localStorage.getItem('token'))?.id ?? this.loggedInUserId;
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.sellerId = params['id'];
       this.loadProfile();

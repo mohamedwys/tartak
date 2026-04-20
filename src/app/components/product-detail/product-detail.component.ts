@@ -7,6 +7,7 @@ import { OfferService } from '../../services/offer.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ReportService } from '../../services/report.service';
+import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
   selector: 'app-product-detail',
@@ -123,12 +124,8 @@ export class ProductDetailComponent implements OnInit {
   }
 
   private checkOwnership(): void {
-    const token = localStorage.getItem('token');
-    if (!token || !this.seller) { this.isOwn = false; return; }
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      this.isOwn = this.seller._id === payload.id;
-    } catch { this.isOwn = false; }
+    const payload = decodeJwtPayload<{ id?: string }>(localStorage.getItem('token'));
+    this.isOwn = !!payload && !!this.seller && this.seller._id === payload.id;
   }
 
   private checkFavorited(): void {

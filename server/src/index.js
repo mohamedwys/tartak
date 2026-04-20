@@ -1,7 +1,15 @@
 import express from 'express';
-import cors from 'cors';
+import helmet from 'helmet';
 import { env } from './config/env.js';
+import { corsMiddleware } from './middleware/cors.js';
+import { httpLogger } from './middleware/logger.js';
 import { notFound, errorHandler } from './middleware/error.js';
+import {
+  authLimiter,
+  uploadLimiter,
+  globalLimiter,
+} from './middleware/rateLimit.js';
+import { requireAuth } from './middleware/auth.js';
 
 import authRoutes      from './routes/auth.routes.js';
 import usersRoutes     from './routes/users.routes.js';
@@ -16,10 +24,27 @@ import uploadRoutes    from './routes/upload.routes.js';
 
 const app = express();
 
-app.use(cors({ origin: env.corsOrigin, credentials: true }));
+// Behind a proxy/load balancer, trust the first hop so req.ip reflects the
+// real client (rate limiter keys on it).
+app.set('trust proxy', 1);
+
+app.use(helmet());
+app.use(corsMiddleware);
+app.use(httpLogger);
 app.use(express.json({ limit: '2mb' }));
 
+app.use(globalLimiter);
+
 app.get('/api/health', (_req, res) => res.json({ ok: true, ts: Date.now() }));
+
+// Stricter limits on credential-facing endpoints.
+app.post('/api/user/login',              authLimiter);
+app.post('/api/user/register',           authLimiter);
+app.post('/api/user/forgot-password',    authLimiter);
+app.post('/api/user/reset-password/*',   authLimiter);
+
+// Upload is per-user; auth must run first so req.user is populated.
+app.use('/api/upload', requireAuth, uploadLimiter);
 
 // Auth is mounted at /api/user/* (register, login, profile, verify, etc)
 // Public /api/user/:id/profile is handled by the users router.

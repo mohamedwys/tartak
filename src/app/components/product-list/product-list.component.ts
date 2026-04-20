@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { AuthService } from '../../services/auth.service';
+import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
   selector: 'app-product-list',
@@ -133,11 +134,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   canDeleteProduct(product: any): boolean {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return product.ownerId === payload.id;
-    } catch { return false; }
+    const payload = decodeJwtPayload<{ id?: string }>(localStorage.getItem('token'));
+    return !!payload && product.ownerId === payload.id;
   }
 }

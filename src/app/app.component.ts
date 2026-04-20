@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
+import { decodeJwtPayload } from './utils/jwt';
 
 @Component({
   selector: 'app-root',
@@ -37,24 +38,23 @@ export class AppComponent implements OnInit {
       this.myInitials = '';
       return;
     }
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const newId = payload.id ?? '';
-      // Only reload inbox count when the active user changes (e.g. after login)
-      if (newId !== this.myId) {
-        this.myId = newId;
-        const name: string = payload.name ?? payload.email ?? '';
-        this.myInitials = name
-          .split(' ')
-          .map((w: string) => w[0])
-          .slice(0, 2)
-          .join('')
-          .toUpperCase();
-        this.loadUnreadCount();
-      }
-    } catch {}
+    const payload = decodeJwtPayload<{ id?: string; name?: string; email?: string }>(
+      localStorage.getItem('token'),
+    );
+    if (!payload) return;
+    const newId = payload.id ?? '';
+    // Only reload inbox count when the active user changes (e.g. after login)
+    if (newId !== this.myId) {
+      this.myId = newId;
+      const name: string = payload.name ?? payload.email ?? '';
+      this.myInitials = name
+        .split(' ')
+        .map((w: string) => w[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase();
+      this.loadUnreadCount();
+    }
   }
 
   private loadUnreadCount(): void {

@@ -6,10 +6,15 @@ function required(name) {
   return v;
 }
 
+function parseCorsOrigin(raw) {
+  if (!raw) return [];
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
 export const env = {
   port: Number(process.env.PORT ?? 5000),
   nodeEnv: process.env.NODE_ENV ?? 'development',
-  corsOrigin: process.env.CORS_ORIGIN ?? '*',
+  corsOrigin: parseCorsOrigin(process.env.CORS_ORIGIN),
 
   supabaseUrl: required('SUPABASE_URL'),
   supabaseServiceRoleKey: required('SUPABASE_SERVICE_ROLE_KEY'),
