@@ -83,10 +83,11 @@ export class CategoryService {
   // so the product-detail breadcrumb doesn't need another network round-trip.
   ancestorsOf(id: string): CategoryNode[] {
     const out: CategoryNode[] = [];
-    let cur = this.flatById?.get(id) ?? null;
-    if (!cur) return out;
-    while (cur.parentId) {
-      const p = this.flatById?.get(cur.parentId) ?? null;
+    const byId = this.flatById;
+    if (!byId) return out;
+    let cur: CategoryNode | undefined = byId.get(id);
+    while (cur?.parentId) {
+      const p = byId.get(cur.parentId);
       if (!p) break;
       out.unshift(p);
       cur = p;
