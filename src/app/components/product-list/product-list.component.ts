@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { FavoriteService } from '../../services/favorite.service';
@@ -39,6 +39,9 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   // Marketplace-mode category pill row (top-level only from the taxonomy).
   topCategories: CategoryNode[] = [];
   selectedCategoryId: string | null = null;
+  // Marketplace pill overflow — first N visible, rest behind "More ▾".
+  readonly mpVisibleLimit = 8;
+  mpMoreMenuOpen = false;
   sortOptions = [
     { value: 'newest',     label: 'Newest' },
     { value: 'price_asc',  label: 'Price: Low to High' },
@@ -112,6 +115,29 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.selectedCategoryId = null;
     this.loadPage(1, true);
   }
+
+  get visibleMarketplaceCategories(): CategoryNode[] {
+    return this.topCategories.slice(0, this.mpVisibleLimit);
+  }
+
+  get overflowMarketplaceCategories(): CategoryNode[] {
+    return this.topCategories.slice(this.mpVisibleLimit);
+  }
+
+  isOverflowSelected(): boolean {
+    if (!this.selectedCategoryId) return false;
+    return this.overflowMarketplaceCategories.some((c) => c._id === this.selectedCategoryId);
+  }
+
+  toggleMpMoreMenu(event?: Event): void {
+    event?.stopPropagation();
+    this.mpMoreMenuOpen = !this.mpMoreMenuOpen;
+  }
+
+  closeMpMoreMenu(): void { this.mpMoreMenuOpen = false; }
+
+  @HostListener('document:click')
+  private onDocumentClickCloseMpMore(): void { this.mpMoreMenuOpen = false; }
 
   isMarketplace(): boolean { return this.mode === 'marketplace'; }
   isPro(): boolean { return this.mode === 'pro'; }

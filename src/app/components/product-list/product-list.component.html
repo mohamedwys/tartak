@@ -24,24 +24,38 @@
     </div>
   </div>
 
-  <!-- Legacy text-category chips — Pro mode only (back-compat) -->
-  <div *ngIf="isPro()" class="categories-bar">
-    <div class="categories-inner">
-      <button type="button" class="cat-chip" [class.active]="selectedCategory === ''" (click)="selectCategory('')">All</button>
-      <button type="button" *ngFor="let cat of categories" class="cat-chip"
-        [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">{{ cat }}</button>
-    </div>
-  </div>
-
-  <!-- Marketplace: taxonomy-backed pill row (top-level only).
-       Clicking an active pill clears the filter. -->
+  <!-- Marketplace: taxonomy-backed pill row with overflow "More ▾" dropdown
+       so the 14 top-level categories never get clipped. Pro mode uses the
+       global top-nav bar in the header, so no inline bar is needed here. -->
   <div *ngIf="isMarketplace() && topCategories.length > 0" class="categories-bar mp-categories-bar">
     <div class="categories-inner">
       <button type="button" class="cat-chip" [class.active]="selectedCategoryId === null"
         (click)="clearMarketplaceCategory()">All</button>
-      <button type="button" *ngFor="let c of topCategories" class="cat-chip"
+      <button type="button" *ngFor="let c of visibleMarketplaceCategories" class="cat-chip"
         [class.active]="selectedCategoryId === c._id"
         (click)="selectMarketplaceCategory(c._id)">{{ c.name }}</button>
+
+      <div *ngIf="overflowMarketplaceCategories.length > 0"
+           class="mp-more-menu" (click)="$event.stopPropagation()">
+        <button type="button" class="cat-chip cat-chip-more"
+                [class.active]="isOverflowSelected()"
+                (click)="toggleMpMoreMenu($event)"
+                [attr.aria-expanded]="mpMoreMenuOpen">
+          More
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="mp-more-dropdown" *ngIf="mpMoreMenuOpen">
+          <button type="button" *ngFor="let c of overflowMarketplaceCategories"
+                  class="mp-more-item"
+                  [class.active]="selectedCategoryId === c._id"
+                  (click)="selectMarketplaceCategory(c._id); closeMpMoreMenu()">
+            {{ c.name }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
