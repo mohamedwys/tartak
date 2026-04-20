@@ -1,0 +1,73 @@
+<section
+  *ngIf="!loading && banners.length > 0"
+  class="home-hero"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="Featured banners"
+  tabindex="0"
+>
+  <div class="hero-stage">
+    <ng-container *ngFor="let banner of banners; let i = index; trackBy: trackById">
+      <article
+        class="hero-slide"
+        [class.active]="i === index"
+        [style]="bgStyle(banner)"
+        [attr.aria-hidden]="i === index ? null : 'true'"
+        role="group"
+        aria-roledescription="slide"
+      >
+        <div class="hero-inner">
+          <h2 class="hero-title">{{ banner.title }}</h2>
+          <p *ngIf="banner.subtitle" class="hero-subtitle">{{ banner.subtitle }}</p>
+          <button
+            *ngIf="banner.ctaLabel && banner.ctaUrl"
+            type="button"
+            class="hero-cta"
+            (click)="onCtaClick(banner)"
+          >
+            {{ banner.ctaLabel }}
+          </button>
+        </div>
+      </article>
+    </ng-container>
+
+    <button
+      *ngIf="banners.length > 1"
+      type="button"
+      class="hero-arrow hero-arrow-prev"
+      aria-label="Previous banner"
+      (click)="prev()"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <button
+      *ngIf="banners.length > 1"
+      type="button"
+      class="hero-arrow hero-arrow-next"
+      aria-label="Next banner"
+      (click)="next()"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div *ngIf="banners.length > 1" class="hero-dots" role="tablist" aria-label="Select banner">
+    <button
+      *ngFor="let banner of banners; let i = index"
+      type="button"
+      class="hero-dot"
+      [class.active]="i === index"
+      role="tab"
+      [attr.aria-selected]="i === index"
+      [attr.aria-label]="'Go to banner ' + (i + 1)"
+      (click)="goTo(i)"
+    ></button>
+  </div>
+</section>

@@ -1,0 +1,90 @@
+<div *ngIf="!loading" class="home-featured">
+  <section *ngIf="trending.length > 0" class="featured-section">
+    <header class="featured-header">
+      <h2 class="featured-title">Trending now</h2>
+    </header>
+    <div class="trending-grid">
+      <div
+        *ngFor="let product of trending; trackBy: trackProduct"
+        class="trending-card"
+        role="button"
+        tabindex="0"
+        (click)="openProduct(product._id)"
+        (keydown.enter)="openProduct(product._id)"
+        (keydown.space)="$event.preventDefault(); openProduct(product._id)"
+      >
+        <div class="trending-img-wrap">
+          <img
+            [src]="product.imageUrl | img: 480"
+            [alt]="product.name"
+            class="trending-img"
+            loading="lazy"
+          >
+          <button
+            type="button"
+            class="btn-heart"
+            [class.favorited]="isFavorited(product._id)"
+            (click)="toggleFavorite(product._id, $event)"
+            [attr.aria-label]="isFavorited(product._id) ? 'Remove from favorites' : 'Save to favorites'"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                [attr.fill]="isFavorited(product._id) ? 'currentColor' : 'none'"
+                stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="trending-info">
+          <div class="trending-price">{{ product.price | currency }}</div>
+          <div class="trending-name">{{ product.name }}</div>
+          <div *ngIf="orgName(product)" class="trending-org">{{ orgName(product) }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="storefronts.length > 0" class="featured-section">
+    <header class="featured-header">
+      <h2 class="featured-title">Featured storefronts</h2>
+    </header>
+    <div class="storefronts-grid">
+      <article
+        *ngFor="let store of storefronts; trackBy: trackStore"
+        class="store-card"
+        role="button"
+        tabindex="0"
+        (click)="openStorefront(store.slug)"
+        (keydown.enter)="openStorefront(store.slug)"
+        (keydown.space)="$event.preventDefault(); openStorefront(store.slug)"
+      >
+        <div
+          class="store-cover"
+          [style.background-image]="store.coverUrl ? 'url(' + store.coverUrl + ')' : null"
+          [class.store-cover-empty]="!store.coverUrl"
+        ></div>
+        <div class="store-logo" [attr.aria-hidden]="true">
+          <img *ngIf="store.logoUrl" [src]="store.logoUrl" [alt]="" class="store-logo-img">
+          <span *ngIf="!store.logoUrl" class="store-logo-initial">{{ initial(store.name) }}</span>
+        </div>
+        <div class="store-body">
+          <div class="store-name-row">
+            <span class="store-name">{{ store.name }}</span>
+            <span *ngIf="store.kybStatus === 'verified'" class="store-badge" title="Verified">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 2l2.5 2.5L18 4l.5 3.5L22 9l-2 3 2 3-3.5 1.5L18 20l-3.5-.5L12 22l-2.5-2.5L6 20l-.5-3.5L2 15l2-3-2-3 3.5-1.5L6 4l3.5.5L12 2z"
+                  fill="currentColor"/>
+                <path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="var(--surface)" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Verified
+            </span>
+          </div>
+          <a class="store-link" (click)="$event.stopPropagation(); openStorefront(store.slug)">
+            Visit store →
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

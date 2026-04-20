@@ -142,6 +142,25 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   isMarketplace(): boolean { return this.mode === 'marketplace'; }
   isPro(): boolean { return this.mode === 'pro'; }
 
+  // True when the user has narrowed the grid. The Pro home modules
+  // (hero/tiles/featured) hide once any filter is active so the grid
+  // takes the full viewport.
+  hasActiveFilters(): boolean {
+    return !!(
+      this.searchQuery ||
+      this.selectedCategory ||
+      this.selectedCondition ||
+      this.selectedCategoryId ||
+      this.minPrice ||
+      this.maxPrice ||
+      this.location
+    );
+  }
+
+  showHomeModules(): boolean {
+    return this.isPro() && this.page === 1 && !this.hasActiveFilters();
+  }
+
   private buildParams(page: number): Record<string, string | number> {
     const p: Record<string, string | number> = { page, limit: 20, sort: this.sort };
     if (this.searchQuery)      p['q']         = this.searchQuery;

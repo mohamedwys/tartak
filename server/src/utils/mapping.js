@@ -168,3 +168,30 @@ export function toOrder(row) {
     createdAt: row.created_at,
   };
 }
+
+export function toBanner(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    title: row.title,
+    subtitle: row.subtitle ?? null,
+    ctaLabel: row.cta_label ?? null,
+    ctaUrl: row.cta_url ?? null,
+    imageUrl: row.image_url ?? null,
+    bgColor: row.bg_color ?? null,
+    sortOrder: row.sort_order ?? 0,
+    startsAt: row.starts_at ?? null,
+    endsAt: row.ends_at ?? null,
+  };
+}
+
+export function toTile(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    label: row.label,
+    iconUrl: row.icon_url ?? null,
+    targetUrl: row.target_url,
+    sortOrder: row.sort_order ?? 0,
+  };
+}

@@ -1,0 +1,17 @@
+<section *ngIf="!loading && tiles.length > 0" class="home-tiles" aria-label="Quick access">
+  <div class="tiles-inner">
+    <button
+      *ngFor="let tile of tiles; trackBy: trackById"
+      type="button"
+      class="tile"
+      (click)="openTile(tile)"
+      [attr.aria-label]="tile.label"
+    >
+      <span class="tile-icon" [attr.aria-hidden]="true">
+        <img *ngIf="tile.iconUrl" [src]="tile.iconUrl" [alt]="" class="tile-icon-img">
+        <span *ngIf="!tile.iconUrl" class="tile-initial">{{ initial(tile) }}</span>
+      </span>
+      <span class="tile-label">{{ tile.label }}</span>
+    </button>
+  </div>
+</section>

@@ -23,6 +23,9 @@ import { StorefrontComponent } from './components/storefront/storefront.componen
 import { CategoryPageComponent } from './components/category-page/category-page.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
+import { HomeHeroComponent } from './components/home-hero/home-hero.component';
+import { HomeTilesComponent } from './components/home-tiles/home-tiles.component';
+import { HomeFeaturedComponent } from './components/home-featured/home-featured.component';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
 import { ImagePipe } from './pipes/image.pipe';
 import { AuthGuard } from './guards/auth.guard';
@@ -47,6 +50,9 @@ import { AuthGuard } from './guards/auth.guard';
     StorefrontComponent,
     CategoryPageComponent,
     ToastComponent,
+    HomeHeroComponent,
+    HomeTilesComponent,
+    HomeFeaturedComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImagePipe, ImageUploadComponent],
   providers: [AuthGuard],

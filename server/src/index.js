@@ -24,6 +24,7 @@ import uploadRoutes    from './routes/upload.routes.js';
 import orgsRoutes      from './routes/orgs.routes.js';
 import storefrontsRoutes from './routes/storefronts.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
+import homeRoutes       from './routes/home.routes.js';
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/upload',    uploadRoutes);
 app.use('/api/orgs',      orgsRoutes);
 app.use('/api/storefronts', storefrontsRoutes);
 app.use('/api/categories', categoriesRoutes);
+app.use('/api/home',       homeRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
