@@ -23,6 +23,7 @@ import { StorefrontComponent } from './components/storefront/storefront.componen
 import { ToastComponent } from './components/toast/toast.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
+import { ImagePipe } from './pipes/image.pipe';
 import { AuthGuard } from './guards/auth.guard';
 
 @NgModule({
@@ -45,7 +46,7 @@ import { AuthGuard } from './guards/auth.guard';
     StorefrontComponent,
     ToastComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImageUploadComponent],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImagePipe, ImageUploadComponent],
   providers: [AuthGuard],
   bootstrap: [AppComponent]
 })

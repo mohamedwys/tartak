@@ -25,7 +25,7 @@
     <li *ngFor="let t of visibleThreads; trackBy: trackByThread"
         class="inq-row" [class.inq-row-unread]="t.unreadCount > 0"
         (click)="open(t)">
-      <img *ngIf="t.product.imageUrl" [src]="t.product.imageUrl" [alt]="t.product.name" class="inq-thumb" />
+      <img *ngIf="t.product.imageUrl" [src]="t.product.imageUrl | img: 120" [alt]="t.product.name" class="inq-thumb" />
       <div *ngIf="!t.product.imageUrl" class="inq-thumb inq-thumb-placeholder"></div>
 
       <div class="inq-main">

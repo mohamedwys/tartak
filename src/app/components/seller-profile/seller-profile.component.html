@@ -49,7 +49,7 @@
       <div class="listings-grid">
         <div *ngFor="let item of listings" class="listing-card" (click)="openProduct(item._id)">
           <div class="listing-img-wrap">
-            <img [src]="item.imageUrl" [alt]="item.name" class="listing-img" loading="lazy">
+            <img [src]="item.imageUrl | img: 480" [alt]="item.name" class="listing-img" loading="lazy">
           </div>
           <div class="listing-info">
             <div class="listing-price">{{ item.price | currency }}</div>

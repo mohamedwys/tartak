@@ -75,7 +75,7 @@
         class="product-card" (click)="openProduct(product._id)">
 
         <div class="product-image-wrap">
-          <img [src]="product.imageUrl" [alt]="product.name" class="product-image" loading="lazy">
+          <img [src]="product.imageUrl | img: 480" [alt]="product.name" class="product-image" loading="lazy">
 
           <!-- Sold badge -->
           <div *ngIf="product.sold" class="sold-tag">SOLD</div>

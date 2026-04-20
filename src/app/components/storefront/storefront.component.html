@@ -18,7 +18,7 @@
     <section class="store-banner" [style.background]="heroBackground">
       <div class="store-banner-overlay" *ngIf="bannerStyle === 'image'"></div>
       <div class="store-logo" [style.borderColor]="accentColor">
-        <img *ngIf="org.logoUrl" [src]="org.logoUrl" [alt]="org.name">
+        <img *ngIf="org.logoUrl" [src]="org.logoUrl | img: 240" [alt]="org.name">
         <span *ngIf="!org.logoUrl">{{ orgInitials }}</span>
       </div>
     </section>
@@ -64,7 +64,7 @@
       <div *ngIf="products.length" class="store-grid">
         <div *ngFor="let p of products" class="store-card" (click)="openProduct(p._id)">
           <div class="store-card-img">
-            <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" loading="lazy">
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl | img: 480" [alt]="p.name" loading="lazy">
           </div>
           <div class="store-card-body">
             <div class="store-card-price">{{ p.price | currency }}</div>

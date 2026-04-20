@@ -10,6 +10,7 @@ import { ComingSoonComponent } from './coming-soon/coming-soon.component';
 import { DashboardStorefrontComponent } from './storefront/storefront.component';
 import { ImageUploadComponent } from '../components/image-upload/image-upload.component';
 import { TimeAgoPipe } from '../pipes/time-ago.pipe';
+import { ImagePipe } from '../pipes/image.pipe';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { TimeAgoPipe } from '../pipes/time-ago.pipe';
     FormsModule,
     DashboardRoutingModule,
     TimeAgoPipe,
+    ImagePipe,
     ImageUploadComponent,
   ],
 })

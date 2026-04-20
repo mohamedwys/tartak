@@ -32,6 +32,7 @@
   >
 </div>
 
+<p *ngIf="compressing" class="upload-status">Optimizing image…</p>
 <p *ngIf="uploading" class="upload-status">Uploading…</p>
 <p *ngIf="uploadError" class="upload-error">{{ uploadError }}</p>
-<a *ngIf="previewUrl && !uploading" class="change-photo" (click)="fileInput.click(); $event.preventDefault()">Change photo</a>
+<a *ngIf="previewUrl && !uploading && !compressing" class="change-photo" (click)="fileInput.click(); $event.preventDefault()">Change photo</a>

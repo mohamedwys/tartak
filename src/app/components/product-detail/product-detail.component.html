@@ -48,7 +48,7 @@
     <!-- Left: image -->
     <div class="detail-images">
       <div class="main-image-wrap">
-        <img [src]="photos[activePhotoIndex]" [alt]="product.name" class="main-image">
+        <img [src]="photos[activePhotoIndex] | img: 1200" [alt]="product.name" class="main-image">
 
         <!-- Favorite button -->
         <button class="btn-fav" [class.favorited]="isFavorited"
@@ -83,7 +83,7 @@
         <button *ngFor="let url of photos; let i = index"
           class="thumb-btn" [class.active]="i === activePhotoIndex"
           (click)="setPhoto(i)">
-          <img [src]="url" [alt]="product.name + ' photo ' + (i+1)">
+          <img [src]="url | img: 200" [alt]="product.name + ' photo ' + (i+1)">
         </button>
       </div>
     </div>
@@ -211,7 +211,7 @@
     <div class="mini-grid">
       <a *ngFor="let item of otherListings"
         [routerLink]="['/product', item._id]" class="mini-card">
-        <img [src]="item.imageUrl" [alt]="item.name" class="mini-card-img" loading="lazy">
+        <img [src]="item.imageUrl | img: 320" [alt]="item.name" class="mini-card-img" loading="lazy">
         <div class="mini-card-info">
           <div class="mini-card-price">{{ item.price | currency }}</div>
           <div class="mini-card-name">{{ item.name }}</div>
@@ -226,7 +226,7 @@
     <div class="mini-grid">
       <a *ngFor="let item of similarListings"
         [routerLink]="['/product', item._id]" class="mini-card">
-        <img [src]="item.imageUrl" [alt]="item.name" class="mini-card-img" loading="lazy">
+        <img [src]="item.imageUrl | img: 320" [alt]="item.name" class="mini-card-img" loading="lazy">
         <div class="mini-card-info">
           <div class="mini-card-price">{{ item.price | currency }}</div>
           <div class="mini-card-name">{{ item.name }}</div>

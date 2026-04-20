@@ -36,7 +36,7 @@
         <div *ngIf="!stats.recentListings.length" class="ov-empty">No listings yet.</div>
         <ul class="ov-list" *ngIf="stats.recentListings.length">
           <li *ngFor="let p of stats.recentListings" class="ov-list-item" (click)="openListing()">
-            <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" class="ov-thumb" />
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl | img: 120" [alt]="p.name" class="ov-thumb" />
             <div *ngIf="!p.imageUrl" class="ov-thumb ov-thumb-placeholder"></div>
             <div class="ov-item-main">
               <div class="ov-item-title">{{ p.name }}</div>
@@ -55,7 +55,7 @@
         <div *ngIf="!stats.recentMessages.length" class="ov-empty">No messages yet.</div>
         <ul class="ov-list" *ngIf="stats.recentMessages.length">
           <li *ngFor="let m of stats.recentMessages" class="ov-list-item" (click)="openMessage(m)">
-            <img *ngIf="m.product?.imageUrl" [src]="m.product.imageUrl" [alt]="m.product.name" class="ov-thumb" />
+            <img *ngIf="m.product?.imageUrl" [src]="m.product.imageUrl | img: 120" [alt]="m.product.name" class="ov-thumb" />
             <div *ngIf="!m.product?.imageUrl" class="ov-thumb ov-thumb-placeholder"></div>
             <div class="ov-item-main">
               <div class="ov-item-title">{{ m.sender?.name || 'Buyer' }}</div>

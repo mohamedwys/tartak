@@ -52,7 +52,7 @@
       <tbody>
         <tr *ngFor="let p of products; trackBy: trackById">
           <td class="cat-col-image">
-            <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" class="cat-thumb" />
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl | img: 160" [alt]="p.name" class="cat-thumb" />
             <div *ngIf="!p.imageUrl" class="cat-thumb cat-thumb-placeholder"></div>
           </td>
           <td class="cat-cell-name">

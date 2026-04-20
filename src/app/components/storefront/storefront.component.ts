@@ -9,6 +9,7 @@ import {
   Storefront,
   StorefrontPublicResponse,
 } from '../../services/org.service';
+import { transformImageUrl } from '../../pipes/image.pipe';
 
 type Tab = 'listings' | 'about';
 
@@ -110,7 +111,8 @@ export class StorefrontComponent implements OnInit, OnDestroy {
 
   get heroBackground(): string {
     if (this.bannerStyle === 'image' && this.org?.coverUrl) {
-      return `url(${this.org.coverUrl}) center/cover no-repeat`;
+      const url = transformImageUrl(this.org.coverUrl, { width: 1600, quality: 80 }) ?? this.org.coverUrl;
+      return `url(${url}) center/cover no-repeat`;
     }
     return this.primaryColor;
   }
