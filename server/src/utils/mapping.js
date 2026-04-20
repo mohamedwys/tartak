@@ -49,6 +49,15 @@ export function toOrganization(row, extra = {}) {
   };
 }
 
+export function toStorefront(row, org) {
+  return {
+    slug: row?.slug ?? org?.slug ?? null,
+    theme: row?.theme ?? {},
+    seo: row?.seo ?? {},
+    policies: row?.policies ?? {},
+  };
+}
+
 export function toOrgMember(row, user) {
   if (!row) return null;
   return {
@@ -77,6 +86,9 @@ export function toInvitation(row, user) {
 
 export function toProduct(row, owner) {
   if (!row) return null;
+  const orgRel = row.org && typeof row.org === 'object'
+    ? { _id: row.org.id, name: row.org.name, slug: row.org.slug }
+    : null;
   return {
     _id: row.id,
     name: row.name,
@@ -89,6 +101,7 @@ export function toProduct(row, owner) {
     sold: row.sold,
     status: row.status ?? 'active',
     orgId: row.org_id ?? null,
+    org: orgRel,
     ownerId: owner ? toUserPublic(owner) : row.owner_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

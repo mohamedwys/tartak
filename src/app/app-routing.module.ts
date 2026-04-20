@@ -14,6 +14,7 @@ import { VerifyEmailComponent } from './components/verify-email/verify-email.com
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
+import { StorefrontComponent } from './components/storefront/storefront.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'inbox',                         component: InboxComponent,         canActivate: [AuthGuard] },
   { path: 'conversation/:userId/:productId', component: ConversationComponent, canActivate: [AuthGuard] },
   { path: 'seller/:id',                    component: SellerProfileComponent },
+  { path: 'store/:slug',                   component: StorefrontComponent },
   { path: 'profile/edit',                  component: EditProfileComponent,   canActivate: [AuthGuard] },
   { path: 'verify-email',                  component: VerifyEmailComponent },
   { path: 'forgot-password',               component: ForgotPasswordComponent },

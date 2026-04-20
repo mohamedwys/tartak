@@ -11,6 +11,7 @@ import {
   toProduct,
   toMessage,
   toOffer,
+  toStorefront,
 } from '../utils/mapping.js';
 
 const router = Router();
@@ -160,6 +161,22 @@ router.post('/', asyncHandler(async (req, res) => {
     .update({ account_type: 'business', current_org_id: org.id })
     .eq('id', req.user.id);
   if (userErr) throw userErr;
+
+  // Best-effort default storefront row so the dashboard + public page have
+  // something to read immediately. Failure here is not fatal — readers
+  // gracefully fall back to defaults when the row is missing.
+  const { error: sfErr } = await supabase
+    .from('storefronts')
+    .insert({
+      org_id: org.id,
+      slug,
+      theme: {},
+      seo: {},
+      policies: {},
+    });
+  if (sfErr) {
+    console.warn('[storefronts] default insert failed for org', org.id, sfErr.message);
+  }
 
   res.status(201).json(toOrganization(org, { memberCount: 1 }));
 }));
@@ -765,6 +782,150 @@ router.get(
         pendingOffer: t.pendingOffer,
       })),
     );
+  }),
+);
+
+const hexColor = z
+  .string()
+  .trim()
+  .regex(/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/, 'Must be a hex color (e.g. #ff6b35)');
+
+const storefrontUpdateSchema = z.object({
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9-]+$/, 'Slug may only contain lowercase letters, numbers, and dashes')
+    .min(3)
+    .max(48)
+    .optional(),
+  theme: z
+    .object({
+      primaryColor: hexColor.optional(),
+      accentColor: hexColor.optional(),
+      bannerStyle: z.enum(['solid', 'image']).optional(),
+    })
+    .strict()
+    .optional(),
+  seo: z
+    .object({
+      title: z.string().trim().max(120).optional(),
+      description: z.string().trim().max(300).optional(),
+      ogImage: z.string().trim().url().max(500).optional(),
+    })
+    .strict()
+    .optional(),
+  policies: z
+    .object({
+      shipping: z.string().max(4000).optional(),
+      returns: z.string().max(4000).optional(),
+      contact: z.string().max(2000).optional(),
+    })
+    .strict()
+    .optional(),
+  logoUrl: z.string().url().optional().nullable(),
+  coverUrl: z.string().url().optional().nullable(),
+});
+
+// GET /api/orgs/:id/storefront — agent+
+router.get(
+  '/:id/storefront',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const { data: org, error: orgErr } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', req.params.id)
+      .maybeSingle();
+    if (orgErr) throw orgErr;
+    if (!org) throw new HttpError(404, 'Organization not found');
+
+    const { data: row, error } = await supabase
+      .from('storefronts')
+      .select('*')
+      .eq('org_id', org.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    res.json({
+      org: toOrganization(org),
+      storefront: toStorefront(row, org),
+    });
+  }),
+);
+
+// PUT /api/orgs/:id/storefront — admin+
+router.put(
+  '/:id/storefront',
+  requireOrgRole('admin'),
+  asyncHandler(async (req, res) => {
+    const body = storefrontUpdateSchema.parse(req.body ?? {});
+    const orgId = req.params.id;
+
+    const { data: org, error: orgErr } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', orgId)
+      .maybeSingle();
+    if (orgErr) throw orgErr;
+    if (!org) throw new HttpError(404, 'Organization not found');
+
+    let nextSlug = org.slug;
+    if (body.slug && body.slug !== org.slug) {
+      const { data: clash } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('slug', body.slug)
+        .neq('id', orgId)
+        .maybeSingle();
+      if (clash) {
+        throw new HttpError(409, 'That slug is already taken. Try another.');
+      }
+      nextSlug = body.slug;
+    }
+
+    const orgPatch = {};
+    if (nextSlug !== org.slug) orgPatch.slug = nextSlug;
+    if (body.logoUrl !== undefined) orgPatch.logo_url = body.logoUrl;
+    if (body.coverUrl !== undefined) orgPatch.cover_url = body.coverUrl;
+
+    let updatedOrg = org;
+    if (Object.keys(orgPatch).length > 0) {
+      const { data, error } = await supabase
+        .from('organizations')
+        .update(orgPatch)
+        .eq('id', orgId)
+        .select('*')
+        .single();
+      if (error) throw error;
+      updatedOrg = data;
+    }
+
+    const { data: existing } = await supabase
+      .from('storefronts')
+      .select('*')
+      .eq('org_id', orgId)
+      .maybeSingle();
+
+    const storefrontPayload = {
+      org_id: orgId,
+      slug: nextSlug,
+      theme: body.theme ?? existing?.theme ?? {},
+      seo: body.seo ?? existing?.seo ?? {},
+      policies: body.policies ?? existing?.policies ?? {},
+    };
+
+    const { data: storefrontRow, error: sfErr } = await supabase
+      .from('storefronts')
+      .upsert(storefrontPayload, { onConflict: 'org_id' })
+      .select('*')
+      .single();
+    if (sfErr) throw sfErr;
+
+    res.json({
+      org: toOrganization(updatedOrg, { memberCount: await memberCount(orgId) }),
+      storefront: toStorefront(storefrontRow, updatedOrg),
+    });
   }),
 );
 

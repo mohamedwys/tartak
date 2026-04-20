@@ -1,0 +1,130 @@
+<div class="sf-wrap">
+  <header class="sf-header">
+    <div>
+      <h1 class="sf-title">Storefront</h1>
+      <p class="sf-subtitle">Your public, branded storefront at /store/{{ savedSlug || 'your-slug' }}.</p>
+    </div>
+    <button type="button" class="sf-secondary" (click)="openPreview()"
+      [disabled]="!savedSlug && !slug">Live preview ↗</button>
+  </header>
+
+  <div *ngIf="loading" class="sf-status">Loading…</div>
+  <div *ngIf="!loading && error" class="sf-status sf-status-error">{{ error }}</div>
+
+  <form *ngIf="!loading && !error" class="sf-form" (ngSubmit)="save()" novalidate>
+    <section class="sf-card">
+      <h2 class="sf-section-title">Basics</h2>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-slug">Public URL slug</label>
+        <div class="sf-slug-row">
+          <span class="sf-slug-prefix">/store/</span>
+          <input id="sf-slug" class="sf-input sf-slug-input" type="text"
+            [ngModel]="slug" (ngModelChange)="onSlugChange($event)" name="slug"
+            placeholder="my-store" maxlength="48" autocomplete="off">
+        </div>
+        <p class="sf-hint" *ngIf="slug && !slugError && slug !== savedSlug">
+          URL will be /store/{{ slug }} once saved.
+        </p>
+        <p class="sf-hint" *ngIf="slug && !slugError && slug === savedSlug">
+          Currently live at /store/{{ slug }}.
+        </p>
+        <p class="sf-error" *ngIf="slugError">{{ slugError }}</p>
+      </div>
+
+      <div class="sf-field">
+        <label class="sf-label" for="sf-logo">Logo URL</label>
+        <input id="sf-logo" class="sf-input" type="url" [(ngModel)]="logoUrl" name="logoUrl"
+          placeholder="https://…/logo.png">
+      </div>
+
+      <div class="sf-field">
+        <label class="sf-label" for="sf-cover">Cover URL</label>
+        <input id="sf-cover" class="sf-input" type="url" [(ngModel)]="coverUrl" name="coverUrl"
+          placeholder="https://…/cover.jpg">
+      </div>
+    </section>
+
+    <section class="sf-card">
+      <h2 class="sf-section-title">Theme</h2>
+      <div class="sf-grid-2">
+        <div class="sf-field">
+          <label class="sf-label" for="sf-primary">Primary color</label>
+          <div class="sf-color-row">
+            <input id="sf-primary" type="color" [(ngModel)]="primaryColor" name="primaryColor" class="sf-color">
+            <input class="sf-input sf-color-hex" type="text" [(ngModel)]="primaryColor" name="primaryColorHex" maxlength="7">
+          </div>
+        </div>
+        <div class="sf-field">
+          <label class="sf-label" for="sf-accent">Accent color</label>
+          <div class="sf-color-row">
+            <input id="sf-accent" type="color" [(ngModel)]="accentColor" name="accentColor" class="sf-color">
+            <input class="sf-input sf-color-hex" type="text" [(ngModel)]="accentColor" name="accentColorHex" maxlength="7">
+          </div>
+        </div>
+      </div>
+
+      <div class="sf-field">
+        <span class="sf-label">Banner style</span>
+        <div class="sf-radio-row">
+          <label class="sf-radio">
+            <input type="radio" [(ngModel)]="bannerStyle" name="bannerStyle" value="solid">
+            <span>Solid (primary color)</span>
+          </label>
+          <label class="sf-radio">
+            <input type="radio" [(ngModel)]="bannerStyle" name="bannerStyle" value="image">
+            <span>Cover image</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="sf-card">
+      <h2 class="sf-section-title">SEO</h2>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-seo-title">Page title</label>
+        <input id="sf-seo-title" class="sf-input" type="text" [(ngModel)]="seoTitle" name="seoTitle"
+          maxlength="120" placeholder="e.g. Acme Goods on Qwiksell">
+      </div>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-seo-desc">Meta description</label>
+        <textarea id="sf-seo-desc" class="sf-textarea" rows="2" maxlength="300"
+          [(ngModel)]="seoDescription" name="seoDescription"
+          placeholder="Short summary shown on search results and social shares."></textarea>
+      </div>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-seo-og">Open Graph image URL</label>
+        <input id="sf-seo-og" class="sf-input" type="url" [(ngModel)]="seoOgImage" name="seoOgImage"
+          placeholder="https://…/og.png">
+      </div>
+    </section>
+
+    <section class="sf-card">
+      <h2 class="sf-section-title">Policies</h2>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-ship">Shipping</label>
+        <textarea id="sf-ship" class="sf-textarea" rows="4" maxlength="4000"
+          [(ngModel)]="policyShipping" name="policyShipping"
+          placeholder="How you ship, timelines, regions covered."></textarea>
+      </div>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-ret">Returns</label>
+        <textarea id="sf-ret" class="sf-textarea" rows="4" maxlength="4000"
+          [(ngModel)]="policyReturns" name="policyReturns"
+          placeholder="Return window and conditions."></textarea>
+      </div>
+      <div class="sf-field">
+        <label class="sf-label" for="sf-ctc">Contact</label>
+        <textarea id="sf-ctc" class="sf-textarea" rows="3" maxlength="2000"
+          [(ngModel)]="policyContact" name="policyContact"
+          placeholder="Hours, response time, preferred channel."></textarea>
+      </div>
+    </section>
+
+    <div class="sf-actions">
+      <p *ngIf="serverError" class="sf-error">{{ serverError }}</p>
+      <button type="submit" class="sf-primary" [disabled]="saving || !!slugError">
+        {{ saving ? 'Saving…' : 'Save changes' }}
+      </button>
+    </div>
+  </form>
+</div>

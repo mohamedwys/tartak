@@ -131,6 +131,12 @@
         </svg>
       </div>
 
+      <a *ngIf="product?.org?.slug"
+        [routerLink]="['/store', product.org.slug]"
+        class="btn-visit-storefront">
+        Visit {{ product.org.name || 'storefront' }} →
+      </a>
+
       <!-- CTA — not owner -->
       <ng-container *ngIf="!isOwn">
         <div *ngIf="product.sold" class="sold-notice">This item has been sold.</div>

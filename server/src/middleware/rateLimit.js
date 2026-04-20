@@ -31,3 +31,9 @@ export const globalLimiter = makeLimiter({
   max: 300,
   message: 'Too many requests. Please slow down.',
 });
+
+export const storefrontReadLimiter = makeLimiter({
+  windowMs: 5 * 60 * 1000,
+  max: 300,
+  message: 'Too many storefront requests. Please slow down.',
+});

@@ -18,7 +18,8 @@ const productWriteSchema = z.object({
   imageUrls: z.array(z.string().url()).optional().default([]),
 });
 
-const SELECT_WITH_OWNER = '*, owner:users!products_owner_id_fkey(id,name,avatar_url,created_at)';
+const SELECT_WITH_OWNER =
+  '*, owner:users!products_owner_id_fkey(id,name,avatar_url,created_at), org:organizations!products_org_id_fkey(id,name,slug)';
 
 // GET /api/products — list with filters + pagination
 router.get('/', asyncHandler(async (req, res) => {

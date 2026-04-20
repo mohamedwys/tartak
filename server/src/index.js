@@ -22,6 +22,7 @@ import reportsRoutes   from './routes/reports.routes.js';
 import ordersRoutes    from './routes/orders.routes.js';
 import uploadRoutes    from './routes/upload.routes.js';
 import orgsRoutes      from './routes/orgs.routes.js';
+import storefrontsRoutes from './routes/storefronts.routes.js';
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/reports',   reportsRoutes);
 app.use('/api/orders',    ordersRoutes);
 app.use('/api/upload',    uploadRoutes);
 app.use('/api/orgs',      orgsRoutes);
+app.use('/api/storefronts', storefrontsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

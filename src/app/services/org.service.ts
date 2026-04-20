@@ -23,6 +23,52 @@ export interface Organization {
   updatedAt: string;
 }
 
+export interface StorefrontTheme {
+  primaryColor?: string;
+  accentColor?: string;
+  bannerStyle?: 'solid' | 'image';
+}
+
+export interface StorefrontSeo {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+export interface StorefrontPolicies {
+  shipping?: string;
+  returns?: string;
+  contact?: string;
+}
+
+export interface Storefront {
+  slug: string;
+  theme: StorefrontTheme;
+  seo: StorefrontSeo;
+  policies: StorefrontPolicies;
+}
+
+export interface StorefrontEditResponse {
+  org: Organization;
+  storefront: Storefront;
+}
+
+export interface StorefrontPublicResponse {
+  org: Organization;
+  storefront: Storefront;
+  products: any[];
+  ratings: { average: number | null; count: number };
+}
+
+export interface StorefrontUpdatePayload {
+  slug?: string;
+  theme?: StorefrontTheme;
+  seo?: StorefrontSeo;
+  policies?: StorefrontPolicies;
+  logoUrl?: string | null;
+  coverUrl?: string | null;
+}
+
 export interface OrgMember {
   orgId: string;
   userId: string;
@@ -52,6 +98,7 @@ export interface CreateOrgPayload {
 export class OrgService {
   private apiUrl = `${environment.apiUrl}/orgs`;
   private userApiUrl = `${environment.apiUrl}/user`;
+  private storefrontsApiUrl = `${environment.apiUrl}/storefronts`;
 
   constructor(private http: HttpClient) {}
 
@@ -98,6 +145,18 @@ export class OrgService {
 
   listMembers(orgId: string): Observable<OrgMember[]> {
     return this.http.get<OrgMember[]>(`${this.apiUrl}/${orgId}/members`, this.authHeaders());
+  }
+
+  getPublicStorefront(slug: string): Observable<StorefrontPublicResponse> {
+    return this.http.get<StorefrontPublicResponse>(`${this.storefrontsApiUrl}/${encodeURIComponent(slug)}`);
+  }
+
+  getOrgStorefront(orgId: string): Observable<StorefrontEditResponse> {
+    return this.http.get<StorefrontEditResponse>(`${this.apiUrl}/${orgId}/storefront`, this.authHeaders());
+  }
+
+  updateOrgStorefront(orgId: string, payload: StorefrontUpdatePayload): Observable<StorefrontEditResponse> {
+    return this.http.put<StorefrontEditResponse>(`${this.apiUrl}/${orgId}/storefront`, payload, this.authHeaders());
   }
 
   // Swaps the active org context server-side and stores the new JWT locally

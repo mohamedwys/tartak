@@ -19,6 +19,7 @@ import { VerifyEmailComponent } from './components/verify-email/verify-email.com
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
+import { StorefrontComponent } from './components/storefront/storefront.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
@@ -41,6 +42,7 @@ import { AuthGuard } from './guards/auth.guard';
     ForgotPasswordComponent,
     ResetPasswordComponent,
     OnboardingBusinessComponent,
+    StorefrontComponent,
     ToastComponent,
     ImageUploadComponent,
   ],
