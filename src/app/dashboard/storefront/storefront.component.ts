@@ -33,6 +33,9 @@ export class DashboardStorefrontComponent implements OnInit {
 
   slugError = '';
 
+  private savedLogoUrl = '';
+  private savedCoverUrl = '';
+
   constructor(private orgService: OrgService, private toast: ToastService) {}
 
   ngOnInit(): void {
@@ -56,6 +59,8 @@ export class DashboardStorefrontComponent implements OnInit {
         this.slug = this.savedSlug;
         this.logoUrl = res.org.logoUrl ?? '';
         this.coverUrl = res.org.coverUrl ?? '';
+        this.savedLogoUrl = this.logoUrl;
+        this.savedCoverUrl = this.coverUrl;
         this.primaryColor = res.storefront.theme?.primaryColor ?? '#1b2332';
         this.accentColor = res.storefront.theme?.accentColor ?? '#FF6B35';
         this.bannerStyle = res.storefront.theme?.bannerStyle ?? 'solid';
@@ -87,6 +92,11 @@ export class DashboardStorefrontComponent implements OnInit {
       this.slugError = '';
     }
   }
+
+  onLogoUploaded(url: string): void { this.logoUrl = url; }
+  onCoverUploaded(url: string): void { this.coverUrl = url; }
+  clearLogo(): void { this.logoUrl = ''; }
+  clearCover(): void { this.coverUrl = ''; }
 
   openPreview(): void {
     const target = this.slug || this.savedSlug;
@@ -125,8 +135,12 @@ export class DashboardStorefrontComponent implements OnInit {
     if (this.slug && this.slug !== this.savedSlug) {
       payload.slug = this.slug;
     }
-    if (this.logoUrl) payload.logoUrl = this.logoUrl;
-    if (this.coverUrl) payload.coverUrl = this.coverUrl;
+    if (this.logoUrl !== this.savedLogoUrl) {
+      payload.logoUrl = this.logoUrl || null;
+    }
+    if (this.coverUrl !== this.savedCoverUrl) {
+      payload.coverUrl = this.coverUrl || null;
+    }
 
     this.saving = true;
     this.serverError = '';
@@ -134,6 +148,10 @@ export class DashboardStorefrontComponent implements OnInit {
       next: (res) => {
         this.savedSlug = res.storefront.slug ?? res.org.slug ?? '';
         this.slug = this.savedSlug;
+        this.logoUrl = res.org.logoUrl ?? '';
+        this.coverUrl = res.org.coverUrl ?? '';
+        this.savedLogoUrl = this.logoUrl;
+        this.savedCoverUrl = this.coverUrl;
         this.orgName = res.org.name;
         this.saving = false;
         this.toast.success('Storefront saved.');

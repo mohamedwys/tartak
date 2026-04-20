@@ -32,15 +32,15 @@
       </div>
 
       <div class="sf-field">
-        <label class="sf-label" for="sf-logo">Logo URL</label>
-        <input id="sf-logo" class="sf-input" type="url" [(ngModel)]="logoUrl" name="logoUrl"
-          placeholder="https://…/logo.png">
+        <span class="sf-label">Logo</span>
+        <app-image-upload [currentUrl]="logoUrl" (uploaded)="onLogoUploaded($event)"></app-image-upload>
+        <button type="button" *ngIf="logoUrl" class="sf-link-btn" (click)="clearLogo()">Remove logo</button>
       </div>
 
       <div class="sf-field">
-        <label class="sf-label" for="sf-cover">Cover URL</label>
-        <input id="sf-cover" class="sf-input" type="url" [(ngModel)]="coverUrl" name="coverUrl"
-          placeholder="https://…/cover.jpg">
+        <span class="sf-label">Cover image</span>
+        <app-image-upload [currentUrl]="coverUrl" (uploaded)="onCoverUploaded($event)"></app-image-upload>
+        <button type="button" *ngIf="coverUrl" class="sf-link-btn" (click)="clearCover()">Remove cover</button>
       </div>
     </section>
 

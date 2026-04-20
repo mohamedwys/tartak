@@ -49,34 +49,26 @@
   font-size: 14px;
 }
 
-/* Hero */
-.store-hero {
+/* Banner */
+.store-banner {
   position: relative;
-  height: 260px;
+  height: 220px;
   border-radius: 0 0 16px 16px;
-  overflow: hidden;
-  color: #fff;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 24px;
-  box-sizing: border-box;
+  margin-bottom: 56px;
 }
-.store-hero-overlay {
+.store-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 100%);
-}
-.store-hero-inner {
-  position: relative;
-  text-align: center;
-  z-index: 1;
-  transform: translateY(52px);
+  background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.45) 100%);
+  border-radius: 0 0 16px 16px;
 }
 .store-logo {
+  position: absolute;
+  left: 50%;
+  bottom: -48px;
+  transform: translateX(-50%);
   width: 96px;
   height: 96px;
-  margin: 0 auto 12px;
   border-radius: 50%;
   background: #fff;
   border: 4px solid #fff;
@@ -94,34 +86,39 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Header (name + rating) — lives below the banner so nothing gets clipped */
+.store-header {
+  text-align: center;
+  padding: 0 24px;
+}
 .store-name {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+  color: #1b2332;
   display: inline-flex;
   gap: 8px;
   align-items: center;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.35);
 }
 .store-verified { flex-shrink: 0; }
-
 .store-rating {
-  margin-top: 8px;
+  margin-top: 6px;
   display: inline-flex;
   gap: 8px;
   align-items: center;
   font-size: 13px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  color: #4b587a;
 }
 .store-stars { display: inline-flex; gap: 2px; }
-.store-rating-text { opacity: 0.95; }
 
 /* Tabs */
 .store-tabs {
   display: flex;
   gap: 6px;
+  justify-content: center;
   border-bottom: 1px solid #e3e7ee;
-  padding: 68px 24px 0;
+  padding: 24px 24px 0;
   margin-bottom: 24px;
 }
 .store-tab {
@@ -134,9 +131,7 @@
   color: #6b7588;
   cursor: pointer;
 }
-.store-tab.active {
-  color: #1b2332;
-}
+.store-tab.active { color: #1b2332; }
 
 .store-listings, .store-about {
   padding: 0 24px;
@@ -223,8 +218,7 @@
 .store-contact a:hover { text-decoration: underline; }
 
 @media (max-width: 720px) {
-  .store-hero { height: 210px; }
-  .store-hero-inner { transform: translateY(48px); }
-  .store-tabs { padding-top: 62px; padding-left: 16px; padding-right: 16px; }
-  .store-listings, .store-about { padding: 0 16px; }
+  .store-banner { height: 180px; margin-bottom: 52px; }
+  .store-logo { width: 84px; height: 84px; bottom: -42px; }
+  .store-name { font-size: 22px; }
 }

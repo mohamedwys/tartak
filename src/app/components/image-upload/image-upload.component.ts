@@ -1,13 +1,16 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { UploadService } from '../../services/upload.service';
 
 @Component({
   selector: 'app-image-upload',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './image-upload.component.html',
   styleUrls: ['./image-upload.component.css']
 })
-export class ImageUploadComponent implements OnInit, OnDestroy {
+export class ImageUploadComponent implements OnInit, OnChanges, OnDestroy {
   @Input() currentUrl?: string;
   @Output() uploaded = new EventEmitter<string>();
 
@@ -20,8 +23,12 @@ export class ImageUploadComponent implements OnInit, OnDestroy {
   constructor(private uploadService: UploadService) {}
 
   ngOnInit(): void {
-    if (this.currentUrl) {
-      this.previewUrl = this.currentUrl;
+    this.previewUrl = this.currentUrl || null;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('currentUrl' in changes && !this.uploading) {
+      this.previewUrl = this.currentUrl || null;
     }
   }
 

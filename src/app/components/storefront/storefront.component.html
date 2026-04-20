@@ -14,35 +14,37 @@
   </div>
 
   <ng-container *ngIf="!loading && !error && org">
-    <!-- Hero -->
-    <section class="store-hero" [style.background]="heroBackground">
-      <div class="store-hero-overlay" *ngIf="bannerStyle === 'image'"></div>
-      <div class="store-hero-inner">
-        <div class="store-logo" [style.borderColor]="accentColor">
-          <img *ngIf="org.logoUrl" [src]="org.logoUrl" [alt]="org.name">
-          <span *ngIf="!org.logoUrl">{{ orgInitials }}</span>
-        </div>
-        <h1 class="store-name">
-          {{ org.name }}
-          <svg *ngIf="isVerified" class="store-verified" width="20" height="20" viewBox="0 0 24 24" fill="none" [attr.aria-label]="'Verified business'">
-            <path d="M12 2l2.39 2.06 3.11-.66.66 3.11L20.2 9 18.16 11l2.04 2-2.04 2 .66 3.11-3.11-.66L12 19.94 9.61 17.88l-3.11.66-.66-3.11L3.8 13l2.04-2L3.8 9l2.04-2.49-.66-3.11 3.11.66z" [attr.fill]="accentColor"/>
-            <path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </h1>
-        <div *ngIf="ratingCount > 0" class="store-rating">
-          <span class="store-stars">
-            <svg *ngFor="let i of stars(5)" width="14" height="14" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                [attr.fill]="i < (ratingAverage ?? 0) ? accentColor : 'rgba(255,255,255,0.4)'"
-                stroke="none"/>
-            </svg>
-          </span>
-          <span class="store-rating-text">
-            {{ ratingAverage?.toFixed(1) }} ({{ ratingCount }} review{{ ratingCount !== 1 ? 's' : '' }})
-          </span>
-        </div>
+    <!-- Banner -->
+    <section class="store-banner" [style.background]="heroBackground">
+      <div class="store-banner-overlay" *ngIf="bannerStyle === 'image'"></div>
+      <div class="store-logo" [style.borderColor]="accentColor">
+        <img *ngIf="org.logoUrl" [src]="org.logoUrl" [alt]="org.name">
+        <span *ngIf="!org.logoUrl">{{ orgInitials }}</span>
       </div>
     </section>
+
+    <!-- Header: name + rating, outside the banner so nothing gets clipped -->
+    <header class="store-header">
+      <h1 class="store-name">
+        {{ org.name }}
+        <svg *ngIf="isVerified" class="store-verified" width="20" height="20" viewBox="0 0 24 24" fill="none" [attr.aria-label]="'Verified business'">
+          <path d="M12 2l2.39 2.06 3.11-.66.66 3.11L20.2 9 18.16 11l2.04 2-2.04 2 .66 3.11-3.11-.66L12 19.94 9.61 17.88l-3.11.66-.66-3.11L3.8 13l2.04-2L3.8 9l2.04-2.49-.66-3.11 3.11.66z" [attr.fill]="accentColor"/>
+          <path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </h1>
+      <div *ngIf="ratingCount > 0" class="store-rating">
+        <span class="store-stars">
+          <svg *ngFor="let i of stars(5)" width="14" height="14" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              [attr.fill]="i < (ratingAverage ?? 0) ? accentColor : '#d5dbe6'"
+              stroke="none"/>
+          </svg>
+        </span>
+        <span class="store-rating-text">
+          {{ ratingAverage?.toFixed(1) }} ({{ ratingCount }} review{{ ratingCount !== 1 ? 's' : '' }})
+        </span>
+      </div>
+    </header>
 
     <!-- Tabs -->
     <div class="store-tabs">
