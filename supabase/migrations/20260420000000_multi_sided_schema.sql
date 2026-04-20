@@ -24,6 +24,10 @@
 --   * Payments, fulfillment, invoices, quotes, promotions, currency,
 --     tax_class, MOQ and bulk pricing are OUT of scope and NOT added
 --     here. The existing `orders` table is untouched on purpose.
+--   * `product_variants.sku` is unique PER PRODUCT, not globally.
+--     Global uniqueness would prevent two different sellers from ever
+--     using the same internal SKU string (e.g. "TSHIRT-RED-L"), which
+--     is a common collision in a multi-seller marketplace.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -81,15 +85,17 @@ create index if not exists categories_sort_order_idx on public.categories (sort_
 create table if not exists public.product_variants (
   id           uuid primary key default gen_random_uuid(),
   product_id   uuid not null references public.products(id) on delete cascade,
-  sku          text not null unique,
+  sku          text not null,
   attributes   jsonb not null default '{}'::jsonb,
   price        numeric(12,2) not null check (price >= 0),
   stock        int not null default 0 check (stock >= 0),
   weight_grams int,
   created_at   timestamptz not null default now()
 );
-create index if not exists product_variants_product_idx      on public.product_variants (product_id);
-create index if not exists product_variants_in_stock_idx     on public.product_variants (product_id) where stock > 0;
+create unique index if not exists product_variants_product_sku_unique
+  on public.product_variants (product_id, sku);
+create index if not exists product_variants_product_idx  on public.product_variants (product_id);
+create index if not exists product_variants_in_stock_idx on public.product_variants (product_id) where stock > 0;
 
 -- storefronts ---------------------------------------------------------
 create table if not exists public.storefronts (
@@ -146,10 +152,10 @@ create table if not exists public.audit_logs (
   user_agent     text,
   created_at     timestamptz not null default now()
 );
-create index if not exists audit_logs_actor_idx         on public.audit_logs (actor_user_id, created_at desc);
-create index if not exists audit_logs_org_idx           on public.audit_logs (org_id, created_at desc);
-create index if not exists audit_logs_target_idx        on public.audit_logs (target_table, target_id);
-create index if not exists audit_logs_created_at_idx    on public.audit_logs (created_at desc);
+create index if not exists audit_logs_actor_idx      on public.audit_logs (actor_user_id, created_at desc);
+create index if not exists audit_logs_org_idx        on public.audit_logs (org_id, created_at desc);
+create index if not exists audit_logs_target_idx     on public.audit_logs (target_table, target_id);
+create index if not exists audit_logs_created_at_idx on public.audit_logs (created_at desc);
 
 -- events --------------------------------------------------------------
 create table if not exists public.events (
@@ -160,10 +166,10 @@ create table if not exists public.events (
   properties     jsonb not null default '{}'::jsonb,
   created_at     timestamptz not null default now()
 );
-create index if not exists events_name_created_at_idx  on public.events (name, created_at desc);
-create index if not exists events_actor_idx            on public.events (actor_user_id, created_at desc);
-create index if not exists events_org_idx              on public.events (org_id, created_at desc);
-create index if not exists events_created_at_idx       on public.events (created_at desc);
+create index if not exists events_name_created_at_idx on public.events (name, created_at desc);
+create index if not exists events_actor_idx           on public.events (actor_user_id, created_at desc);
+create index if not exists events_org_idx             on public.events (org_id, created_at desc);
+create index if not exists events_created_at_idx     on public.events (created_at desc);
 
 -- ---------------------------------------------------------------------
 -- ALTERs to existing tables (additive, all columns nullable or defaulted)
@@ -178,8 +184,8 @@ alter table public.users
   add column if not exists phone_verified   boolean not null default false,
   add column if not exists locale           text not null default 'en',
   add column if not exists last_login_at    timestamptz;
-create index if not exists users_current_org_idx   on public.users (current_org_id);
-create index if not exists users_account_type_idx  on public.users (account_type);
+create index if not exists users_current_org_idx  on public.users (current_org_id);
+create index if not exists users_account_type_idx on public.users (account_type);
 
 -- products ------------------------------------------------------------
 alter table public.products
@@ -198,11 +204,11 @@ alter table public.products
   add column if not exists category_id   uuid references public.categories(id) on delete set null,
   add column if not exists attributes    jsonb not null default '{}'::jsonb,
   add column if not exists brand         text;
-create index if not exists products_org_idx              on public.products (org_id);
-create index if not exists products_category_id_idx      on public.products (category_id);
-create index if not exists products_status_created_idx   on public.products (status, created_at desc);
-create index if not exists products_country_city_idx     on public.products (country, city);
-create index if not exists products_brand_idx            on public.products (brand);
+create index if not exists products_org_idx            on public.products (org_id);
+create index if not exists products_category_id_idx    on public.products (category_id);
+create index if not exists products_status_created_idx on public.products (status, created_at desc);
+create index if not exists products_country_city_idx   on public.products (country, city);
+create index if not exists products_brand_idx          on public.products (brand);
 
 -- reports -------------------------------------------------------------
 alter table public.reports
