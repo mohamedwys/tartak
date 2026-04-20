@@ -6,6 +6,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { InquiriesComponent } from './inquiries/inquiries.component';
 import { ComingSoonComponent } from './coming-soon/coming-soon.component';
 import { DashboardStorefrontComponent } from './storefront/storefront.component';
+import { PlanComponent } from './plan/plan.component';
 import { DashboardGuard } from './dashboard.guard';
 
 const routes: Routes = [
@@ -22,6 +23,7 @@ const routes: Routes = [
       { path: 'offers',     component: ComingSoonComponent, data: { stub: 'offers' } },
       { path: 'customers',  component: ComingSoonComponent, data: { stub: 'customers' } },
       { path: 'promotions', component: ComingSoonComponent, data: { stub: 'promotions' } },
+      { path: 'plan',       component: PlanComponent },
       { path: 'storefront', component: DashboardStorefrontComponent },
       { path: 'team',       component: ComingSoonComponent, data: { stub: 'team' } },
       { path: 'settings',   component: ComingSoonComponent, data: { stub: 'settings' } },

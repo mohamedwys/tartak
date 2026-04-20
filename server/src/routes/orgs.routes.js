@@ -12,6 +12,9 @@ import {
   toMessage,
   toOffer,
   toStorefront,
+  toSubscriptionPlan,
+  toOrgSubscription,
+  toOrgAddon,
 } from '../utils/mapping.js';
 
 const router = Router();
@@ -176,6 +179,15 @@ router.post('/', asyncHandler(async (req, res) => {
     });
   if (sfErr) {
     console.warn('[storefronts] default insert failed for org', org.id, sfErr.message);
+  }
+
+  // Every new org starts on the Free plan. Non-fatal on failure — the
+  // migration's backfill will pick up orphaned orgs on next deploy.
+  const { error: subErr } = await supabase
+    .from('org_subscriptions')
+    .insert({ org_id: org.id, plan_slug: 'free', status: 'active' });
+  if (subErr) {
+    console.warn('[subscriptions] default Free insert failed for org', org.id, subErr.message);
   }
 
   res.status(201).json(toOrganization(org, { memberCount: 1 }));
@@ -782,6 +794,88 @@ router.get(
         pendingOffer: t.pendingOffer,
       })),
     );
+  }),
+);
+
+// GET /api/orgs/:id/subscription — agent+. Bundles the org, the plan it
+// sits on, subscription status, and current usage vs. the plan's cap.
+// The frontend renders the Plan page entirely from this single payload.
+router.get(
+  '/:id/subscription',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const orgId = req.params.id;
+
+    const [orgRes, subRes] = await Promise.all([
+      supabase.from('organizations').select('id,name,slug').eq('id', orgId).maybeSingle(),
+      supabase.from('org_subscriptions').select('*').eq('org_id', orgId).maybeSingle(),
+    ]);
+    if (orgRes.error) throw orgRes.error;
+    if (subRes.error) throw subRes.error;
+    if (!orgRes.data)  throw new HttpError(404, 'Organization not found');
+
+    // If an org somehow missed the backfill (race with a data-repair script,
+    // direct SQL, etc.), self-heal to Free so the endpoint always has a plan
+    // to surface rather than 500-ing.
+    let sub = subRes.data;
+    if (!sub) {
+      const { data: inserted, error } = await supabase
+        .from('org_subscriptions')
+        .insert({ org_id: orgId, plan_slug: 'free', status: 'active' })
+        .select('*')
+        .single();
+      if (error) throw error;
+      sub = inserted;
+    }
+
+    const { data: plan, error: planErr } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('slug', sub.plan_slug)
+      .maybeSingle();
+    if (planErr) throw planErr;
+    if (!plan) throw new HttpError(500, 'Subscription plan missing');
+
+    const { count: activeListings } = await supabase
+      .from('products')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', orgId)
+      .eq('status', 'active');
+
+    const rawLimit = plan.features?.listing_limit;
+    const listingLimit = typeof rawLimit === 'number' ? rawLimit : null;
+
+    res.json({
+      org: {
+        _id: orgRes.data.id,
+        name: orgRes.data.name,
+        slug: orgRes.data.slug,
+      },
+      plan: toSubscriptionPlan(plan),
+      subscription: toOrgSubscription(sub),
+      usage: {
+        activeListings: activeListings ?? 0,
+        listingLimit,
+      },
+    });
+  }),
+);
+
+// GET /api/orgs/:id/addons — agent+. Active add-ons only; expired /
+// cancelled rows are hidden from this endpoint since the UI treats them
+// as gone. Billing history will live on a separate endpoint later.
+router.get(
+  '/:id/addons',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const { data, error } = await supabase
+      .from('org_addons')
+      .select('*')
+      .eq('org_id', req.params.id)
+      .eq('status', 'active')
+      .order('started_at', { ascending: false });
+    if (error) throw error;
+    res.json((data ?? []).map(toOrgAddon));
   }),
 );
 

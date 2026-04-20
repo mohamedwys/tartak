@@ -4,6 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DashboardService, ProductStatus } from '../dashboard.service';
 import { ProductService } from '../../services/product.service';
+import { SubscriptionService } from '../../services/subscription.service';
 import { ToastService } from '../../services/toast.service';
 import { decodeJwtPayload } from '../../utils/jwt';
 
@@ -32,12 +33,18 @@ export class CatalogComponent implements OnInit, OnDestroy {
   openMenuId: string | null = null;
   statusOptions: ProductStatus[] = ['draft', 'active', 'paused', 'sold', 'removed'];
 
+  // Surfaced next to the "Create listing" button so sellers always see
+  // how much headroom they have against their plan. null = unlimited.
+  listingLimit: number | null = null;
+  activeListingCount = 0;
+
   private search$ = new Subject<string>();
   private sub?: Subscription;
 
   constructor(
     private dashboard: DashboardService,
     private products$: ProductService,
+    private subs: SubscriptionService,
     private toast: ToastService,
     private router: Router,
   ) {}
@@ -51,6 +58,22 @@ export class CatalogComponent implements OnInit, OnDestroy {
       this.load();
     });
     this.load();
+    this.loadUsage();
+  }
+
+  private loadUsage(): void {
+    if (!this.orgId) return;
+    this.subs.getOrgSubscription(this.orgId).subscribe({
+      next: (res) => {
+        this.listingLimit = res.usage.listingLimit;
+        this.activeListingCount = res.usage.activeListings;
+      },
+      error: () => { /* non-critical — hide the badge silently */ },
+    });
+  }
+
+  openPlan(): void {
+    this.router.navigate(['/dashboard/plan']);
   }
 
   ngOnDestroy(): void {

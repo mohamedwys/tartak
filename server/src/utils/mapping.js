@@ -195,3 +195,57 @@ export function toTile(row) {
     sortOrder: row.sort_order ?? 0,
   };
 }
+
+export function toSubscriptionPlan(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    slug: row.slug,
+    name: row.name,
+    priceMinor: row.price_minor,
+    currency: row.currency,
+    billingInterval: row.billing_interval,
+    features: row.features ?? {},
+    sortOrder: row.sort_order ?? 0,
+  };
+}
+
+export function toAddonService(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    slug: row.slug,
+    name: row.name,
+    description: row.description ?? null,
+    priceMinor: row.price_minor,
+    currency: row.currency,
+    type: row.type,
+    durationDays: row.duration_days ?? null,
+    features: row.features ?? {},
+    sortOrder: row.sort_order ?? 0,
+  };
+}
+
+// Intentionally omits stripe_customer_id / stripe_subscription_id —
+// those are server-only and must never leak to the frontend.
+export function toOrgSubscription(row) {
+  if (!row) return null;
+  return {
+    status: row.status,
+    startedAt: row.started_at,
+    currentPeriodEnd: row.current_period_end ?? null,
+    cancelAtPeriodEnd: !!row.cancel_at_period_end,
+  };
+}
+
+export function toOrgAddon(row) {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    addonSlug: row.addon_slug,
+    status: row.status,
+    startedAt: row.started_at,
+    endsAt: row.ends_at ?? null,
+    productId: row.product_id ?? null,
+  };
+}

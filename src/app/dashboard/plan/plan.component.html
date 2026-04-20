@@ -1,0 +1,151 @@
+<div class="plan-wrap">
+  <header class="plan-header">
+    <h1 class="plan-title">Plan &amp; add-ons</h1>
+    <p class="plan-subtitle">Your subscription, usage, and optional boosts for your listings.</p>
+  </header>
+
+  <div *ngIf="loading" class="plan-status">Loading…</div>
+  <div *ngIf="error" class="plan-status plan-status-error">{{ error }}</div>
+
+  <ng-container *ngIf="current && !loading">
+    <!-- ── Current plan banner ───────────────────────────────── -->
+    <section class="plan-banner">
+      <div class="plan-banner-main">
+        <div class="plan-banner-eyebrow">Current plan</div>
+        <div class="plan-banner-title">
+          {{ current.plan.name }} · {{ planBlurb(current.plan) }}
+        </div>
+        <div class="plan-banner-meta">
+          Active since {{ current.subscription.startedAt | date:'mediumDate' }}
+        </div>
+      </div>
+      <span class="plan-chip" [attr.data-status]="current.subscription.status">
+        {{ current.subscription.status }}
+      </span>
+    </section>
+
+    <!-- ── Usage meter ──────────────────────────────────────── -->
+    <section class="plan-card plan-usage">
+      <div class="plan-card-header">
+        <h2>Listings usage</h2>
+      </div>
+      <ng-container *ngIf="current.usage.listingLimit != null; else unlimited">
+        <div class="plan-usage-count">
+          <strong>{{ current.usage.activeListings }}</strong> /
+          {{ current.usage.listingLimit }} active listings
+        </div>
+        <div class="plan-usage-bar" [attr.data-tier]="usageTier">
+          <div class="plan-usage-fill" [style.width.%]="usagePercent"></div>
+        </div>
+      </ng-container>
+      <ng-template #unlimited>
+        <div class="plan-usage-count">
+          <strong>{{ current.usage.activeListings }}</strong> active listings
+        </div>
+        <div class="plan-usage-note">Unlimited listings on {{ current.plan.name }}.</div>
+      </ng-template>
+    </section>
+
+    <!-- ── Plan comparison ─────────────────────────────────── -->
+    <section class="plan-compare">
+      <header class="plan-section-header">
+        <h2>Compare plans</h2>
+      </header>
+
+      <div class="plan-compare-grid">
+        <!-- Free -->
+        <article
+          class="plan-card plan-compare-card"
+          [class.plan-compare-card-current]="currentPlanSlug === 'free'"
+          *ngIf="freePlan"
+        >
+          <header class="plan-compare-card-header">
+            <div class="plan-compare-card-name">{{ freePlan.name }}</div>
+            <div class="plan-compare-card-price">{{ planBlurb(freePlan) }}</div>
+          </header>
+          <ul class="plan-feature-list">
+            <li *ngFor="let row of comparisonRows" class="plan-feature-row">
+              <span class="plan-feature-label">{{ row.label }}</span>
+              <span class="plan-feature-value">{{ featureValue(freePlan, row.key) }}</span>
+            </li>
+          </ul>
+          <button
+            type="button"
+            class="plan-btn plan-btn-ghost"
+            [disabled]="true"
+            [title]="currentPlanSlug === 'free' ? 'This is your current plan' : ''"
+          >
+            {{ currentPlanSlug === 'free' ? 'Your plan' : 'Downgrade unavailable' }}
+          </button>
+          <p class="plan-btn-help" *ngIf="currentPlanSlug !== 'free'">
+            Free is automatic — everyone starts here.
+          </p>
+        </article>
+
+        <!-- Pro -->
+        <article
+          class="plan-card plan-compare-card plan-compare-card-pro"
+          [class.plan-compare-card-current]="currentPlanSlug === 'pro'"
+          *ngIf="proPlan"
+        >
+          <header class="plan-compare-card-header">
+            <div class="plan-compare-card-name">{{ proPlan.name }}</div>
+            <div class="plan-compare-card-price">{{ planBlurb(proPlan) }}</div>
+          </header>
+          <ul class="plan-feature-list">
+            <li *ngFor="let row of comparisonRows" class="plan-feature-row">
+              <span class="plan-feature-label">{{ row.label }}</span>
+              <span class="plan-feature-value">{{ featureValue(proPlan, row.key) }}</span>
+            </li>
+          </ul>
+          <button
+            type="button"
+            class="plan-btn plan-btn-primary"
+            [disabled]="true"
+          >
+            {{ currentPlanSlug === 'pro'
+              ? 'Your plan'
+              : 'Upgrade to Pro — ' + planBlurb(proPlan) }}
+          </button>
+          <p class="plan-btn-help" *ngIf="currentPlanSlug !== 'pro'">{{ comingSoon }}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Add-on services ─────────────────────────────────── -->
+    <section class="plan-addons" *ngIf="addons.length">
+      <header class="plan-section-header">
+        <h2>Boost your listing</h2>
+        <p>Optional paid placements and power-ups. Purchased add-ons stack on top of any plan.</p>
+      </header>
+
+      <div class="plan-addon-grid">
+        <article class="plan-card plan-addon-card" *ngFor="let addon of addons">
+          <div class="plan-addon-name">{{ addon.name }}</div>
+          <div class="plan-addon-price">{{ addonBlurb(addon) }}</div>
+          <p class="plan-addon-desc" *ngIf="addon.description">{{ addon.description }}</p>
+          <button type="button" class="plan-btn plan-btn-secondary" [disabled]="true">
+            Add
+          </button>
+          <p class="plan-btn-help">{{ comingSoon }}</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── My active add-ons ───────────────────────────────── -->
+    <section class="plan-card plan-my-addons" *ngIf="orgAddons.length">
+      <header class="plan-card-header">
+        <h2>My active add-ons</h2>
+      </header>
+      <ul class="plan-my-addons-list">
+        <li *ngFor="let a of orgAddons" class="plan-my-addons-row">
+          <span class="plan-my-addons-name">{{ addonNameForSlug(a.addonSlug) }}</span>
+          <span class="plan-my-addons-meta">
+            active
+            <ng-container *ngIf="a.endsAt"> until {{ a.endsAt | date:'mediumDate' }}</ng-container>
+          </span>
+        </li>
+      </ul>
+    </section>
+  </ng-container>
+</div>

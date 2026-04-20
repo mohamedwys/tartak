@@ -27,6 +27,7 @@ export class DashboardShellComponent implements OnInit {
     { label: 'Offers',     route: 'offers',     stub: 'offers',     implemented: false },
     { label: 'Customers',  route: 'customers',  stub: 'customers',  implemented: false },
     { label: 'Promotions', route: 'promotions', stub: 'promotions', implemented: false },
+    { label: 'Plan',       route: 'plan',       implemented: true },
     { label: 'Storefront', route: 'storefront', implemented: true },
     { label: 'Team',       route: 'team',       stub: 'team',       implemented: false },
     { label: 'Settings',   route: 'settings',   stub: 'settings',   implemented: false },

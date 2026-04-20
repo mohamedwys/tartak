@@ -46,6 +46,27 @@
   padding: var(--space-8);
 }
 
+.limit-banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--warning-100);
+  color: var(--warning-500);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.limit-banner-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
 .field { margin-bottom: var(--space-4); }
 .field label {
   display: block;

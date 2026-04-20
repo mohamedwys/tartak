@@ -25,6 +25,7 @@ import orgsRoutes      from './routes/orgs.routes.js';
 import storefrontsRoutes from './routes/storefronts.routes.js';
 import categoriesRoutes from './routes/categories.routes.js';
 import homeRoutes       from './routes/home.routes.js';
+import { plansRouter, addonsRouter } from './routes/subscriptions.routes.js';
 
 const app = express();
 
@@ -67,6 +68,8 @@ app.use('/api/orgs',      orgsRoutes);
 app.use('/api/storefronts', storefrontsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/home',       homeRoutes);
+app.use('/api/subscription-plans', plansRouter);
+app.use('/api/addon-services',     addonsRouter);
 
 app.use(notFound);
 app.use(errorHandler);

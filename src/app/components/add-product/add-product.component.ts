@@ -20,6 +20,11 @@ export class AddProductComponent implements OnInit {
   condition = '';
   submitting = false;
 
+  // Populated when the backend rejects the insert because the org is at
+  // its plan's listing cap. The form shows an inline banner with a
+  // "View plans" deep-link to /dashboard/plan.
+  limitMessage: string | null = null;
+
   // Cascading category picker — top-level choice drives the subcategory
   // list. When a subcategory is chosen, we submit both category_id (leaf)
   // and category (leaf name) to keep back-compat with text filters.
@@ -102,6 +107,7 @@ export class AddProductComponent implements OnInit {
       return;
     }
     this.submitting = true;
+    this.limitMessage = null;
     const product: any = {
       name: this.name,
       description: this.description,
@@ -128,7 +134,15 @@ export class AddProductComponent implements OnInit {
         }
       },
       error: (err: any) => {
-        this.toastService.error(err.error?.message ?? 'Failed to add product.');
+        const extra = err?.error?.extra;
+        if (err?.status === 403 && extra?.code === 'LISTING_LIMIT_REACHED') {
+          const limit = typeof extra.limit === 'number' ? extra.limit : 10;
+          this.limitMessage =
+            `You've reached the ${limit}-listing limit on the Free plan. Upgrade to Pro to continue.`;
+          this.toastService.error(this.limitMessage);
+        } else {
+          this.toastService.error(err.error?.message ?? 'Failed to add product.');
+        }
         this.submitting = false;
       }
     });

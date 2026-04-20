@@ -1,0 +1,281 @@
+/* ==========================================================
+ * Dashboard plan page
+ * ========================================================== */
+
+.plan-wrap { max-width: 1100px; }
+
+.plan-header { margin-bottom: var(--space-6); }
+.plan-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-3xl);
+}
+.plan-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+}
+
+.plan-status {
+  padding: var(--space-6) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+.plan-status-error { color: var(--error-500); }
+
+/* ── Shared card shell ────────────────────────────── */
+.plan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-xs);
+}
+.plan-card-header {
+  margin-bottom: var(--space-3);
+}
+.plan-card-header h2,
+.plan-section-header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.plan-section-header { margin-bottom: var(--space-3); }
+.plan-section-header p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* ── Current plan banner ─────────────────────────── */
+.plan-banner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.plan-banner-main { min-width: 0; }
+.plan-banner-eyebrow {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+.plan-banner-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.plan-banner-meta {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.plan-chip {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.plan-chip[data-status="active"]     { background: var(--success-100); color: var(--success-500); }
+.plan-chip[data-status="trialing"]   { background: var(--info-100);    color: var(--info-500); }
+.plan-chip[data-status="past_due"]   { background: var(--warning-100); color: var(--warning-500); }
+.plan-chip[data-status="cancelled"]  { background: var(--error-100);   color: var(--error-500); }
+
+/* ── Usage meter ─────────────────────────────────── */
+.plan-usage { margin-bottom: var(--space-5); }
+.plan-usage-count {
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  margin-bottom: var(--space-3);
+}
+.plan-usage-count strong {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.plan-usage-bar {
+  position: relative;
+  height: 10px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.plan-usage-fill {
+  height: 100%;
+  background: var(--success-500);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-med) var(--ease-out);
+}
+.plan-usage-bar[data-tier="warn"]   .plan-usage-fill { background: var(--warning-500); }
+.plan-usage-bar[data-tier="danger"] .plan-usage-fill { background: var(--error-500); }
+.plan-usage-note {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ── Plan comparison ─────────────────────────────── */
+.plan-compare { margin-bottom: var(--space-6); }
+.plan-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+.plan-compare-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.plan-compare-card-current {
+  border-color: var(--brand-700);
+  box-shadow: 0 0 0 2px var(--brand-100);
+}
+.plan-compare-card-header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.plan-compare-card-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.plan-compare-card-price {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.plan-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.plan-feature-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.plan-feature-row:first-child { border-top: 0; }
+.plan-feature-label { color: var(--text-secondary); }
+.plan-feature-value { color: var(--text-primary); font-weight: 500; }
+
+/* ── Buttons (disabled-only for now) ─────────────── */
+.plan-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: not-allowed;
+  width: 100%;
+}
+.plan-btn:disabled { opacity: 0.75; }
+.plan-btn-primary {
+  background: var(--brand-700);
+  color: var(--surface);
+  border-color: var(--brand-700);
+}
+.plan-btn-primary:disabled { background: var(--brand-700); color: var(--surface); opacity: 0.55; }
+.plan-btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+.plan-btn-ghost { background: transparent; }
+.plan-btn-help {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Add-on cards ────────────────────────────────── */
+.plan-addons { margin-bottom: var(--space-6); }
+.plan-addon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+.plan-addon-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.plan-addon-name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.plan-addon-price {
+  font-size: var(--text-base);
+  color: var(--brand-900);
+  font-weight: 600;
+}
+.plan-addon-desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── My active add-ons ───────────────────────────── */
+.plan-my-addons-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.plan-my-addons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.plan-my-addons-row:first-child { border-top: 0; }
+.plan-my-addons-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.plan-my-addons-meta {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+/* ── Small screens ───────────────────────────────── */
+@media (max-width: 640px) {
+  .plan-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

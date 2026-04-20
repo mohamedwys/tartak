@@ -4,9 +4,21 @@
       <h1 class="cat-title">Catalog</h1>
       <p class="cat-subtitle">Manage every listing owned by this organization.</p>
     </div>
-    <button class="cat-primary" type="button" (click)="createListing()">
-      + Create listing
-    </button>
+    <div class="cat-header-actions">
+      <button
+        *ngIf="listingLimit != null"
+        type="button"
+        class="cat-usage-badge"
+        [attr.data-tier]="activeListingCount >= listingLimit ? 'over' : (activeListingCount / listingLimit >= 0.9 ? 'danger' : (activeListingCount / listingLimit >= 0.7 ? 'warn' : 'ok'))"
+        (click)="openPlan()"
+        [title]="'View plans'"
+      >
+        {{ activeListingCount }} / {{ listingLimit }} listings used
+      </button>
+      <button class="cat-primary" type="button" (click)="createListing()">
+        + Create listing
+      </button>
+    </div>
   </header>
 
   <div class="cat-toolbar">

@@ -8,6 +8,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { InquiriesComponent } from './inquiries/inquiries.component';
 import { ComingSoonComponent } from './coming-soon/coming-soon.component';
 import { DashboardStorefrontComponent } from './storefront/storefront.component';
+import { PlanComponent } from './plan/plan.component';
 import { ImageUploadComponent } from '../components/image-upload/image-upload.component';
 import { TimeAgoPipe } from '../pipes/time-ago.pipe';
 import { ImagePipe } from '../pipes/image.pipe';
@@ -20,6 +21,7 @@ import { ImagePipe } from '../pipes/image.pipe';
     InquiriesComponent,
     ComingSoonComponent,
     DashboardStorefrontComponent,
+    PlanComponent,
   ],
   imports: [
     CommonModule,

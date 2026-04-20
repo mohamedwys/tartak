@@ -114,11 +114,47 @@ router.get('/:id/similar', asyncHandler(async (req, res) => {
 // POST /api/products
 router.post('/', requireAuth, asyncHandler(async (req, res) => {
   const body = productWriteSchema.parse(req.body);
+
+  const orgId = req.user.currentOrgId ?? null;
+
+  // Plan-gated listing limit. Only applies to Pro-side listings (org
+  // context set); C2C marketplace posts stay ungated. The Pro plan seeds
+  // `listing_limit: null` → treated as unlimited.
+  if (orgId) {
+    const { data: sub, error: subErr } = await supabase
+      .from('org_subscriptions')
+      .select('plan:subscription_plans(slug,features)')
+      .eq('org_id', orgId)
+      .maybeSingle();
+    if (subErr) throw subErr;
+
+    const plan = sub?.plan ?? null;
+    const rawLimit = plan?.features?.listing_limit;
+    if (typeof rawLimit === 'number') {
+      const { count, error: countErr } = await supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .eq('status', 'active');
+      if (countErr) throw countErr;
+      const current = count ?? 0;
+      if (current >= rawLimit) {
+        throw new HttpError(403, 'Listing limit reached for your plan.', {
+          code: 'LISTING_LIMIT_REACHED',
+          current,
+          limit: rawLimit,
+          plan: plan.slug,
+          upgradeTo: 'pro',
+        });
+      }
+    }
+  }
+
   const { data, error } = await supabase
     .from('products')
     .insert({
       owner_id: req.user.id,
-      org_id: req.user.currentOrgId ?? null,
+      org_id: orgId,
       name: body.name,
       description: body.description,
       price: body.price,
