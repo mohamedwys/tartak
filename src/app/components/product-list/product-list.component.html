@@ -1,117 +1,130 @@
-<!-- Hero search -->
-<div class="browse-hero">
-  <div class="browse-hero-inner">
-    <h1 class="hero-title">Find something great</h1>
-    <div class="search-wrap">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <circle cx="11" cy="11" r="8" stroke="#9CA3AF" stroke-width="2.5"/>
-        <path d="m21 21-4.35-4.35" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
-      <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
-        placeholder="Search for anything…" class="search-input">
-    </div>
-  </div>
-</div>
+<div class="browse-page zellige-backdrop">
 
-<!-- Category chips -->
-<div class="categories-bar">
-  <div class="categories-inner">
-    <button class="cat-chip" [class.active]="selectedCategory === ''" (click)="selectCategory('')">All</button>
-    <button *ngFor="let cat of categories" class="cat-chip"
-      [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">{{ cat }}</button>
-  </div>
-</div>
-
-<!-- Filter bar -->
-<div class="filter-bar">
-  <div class="filter-bar-inner">
-    <select [(ngModel)]="selectedCondition" (change)="onFilterChange()" class="filter-select">
-      <option value="">Condition: All</option>
-      <option *ngFor="let c of conditions" [value]="c">{{ c }}</option>
-    </select>
-    <div class="price-range">
-      <input type="number" [(ngModel)]="minPrice" (input)="onFilterChange()"
-        placeholder="Min $" class="filter-price-input" min="0">
-      <span class="price-sep">–</span>
-      <input type="number" [(ngModel)]="maxPrice" (input)="onFilterChange()"
-        placeholder="Max $" class="filter-price-input" min="0">
-    </div>
-    <select [(ngModel)]="sort" (change)="onFilterChange()" class="filter-select">
-      <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
-    </select>
-  </div>
-</div>
-
-<!-- Grid -->
-<div class="browse-content">
-  <div class="browse-inner">
-
-    <!-- Skeletons while loading -->
-    <div *ngIf="loading" class="products-grid">
-      <div *ngFor="let _ of [1,2,3,4,5,6,7,8,9,10,11,12]" class="skeleton-card">
-        <div class="skeleton-img"></div>
-        <div class="skeleton-body">
-          <div class="skeleton-line"></div>
-          <div class="skeleton-line short"></div>
-        </div>
+  <!-- Hero search -->
+  <div class="browse-hero">
+    <div class="browse-hero-inner">
+      <span class="hero-eyebrow">Independent sellers, handpicked</span>
+      <h1 class="hero-title">Find something made with care</h1>
+      <p class="hero-sub">A trusted marketplace for independent businesses — from small ateliers to growing brands.</p>
+      <div class="search-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+          <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
+          placeholder="Search for anything…" class="search-input" aria-label="Search listings">
       </div>
     </div>
+  </div>
 
-    <!-- Empty state -->
-    <div *ngIf="!loading && products.length === 0" class="empty-state">
-      <div class="empty-icon">🔍</div>
-      <h3>No listings found</h3>
-      <p *ngIf="searchQuery || selectedCategory || selectedCondition || minPrice || maxPrice">
-        Try adjusting your search or filters.
-      </p>
-      <p *ngIf="!searchQuery && !selectedCategory && !selectedCondition && !minPrice && !maxPrice">
-        Nothing here yet. <a routerLink="/add-product">Be the first to list an item.</a>
-      </p>
+  <!-- Category chips -->
+  <div class="categories-bar">
+    <div class="categories-inner">
+      <button type="button" class="cat-chip" [class.active]="selectedCategory === ''" (click)="selectCategory('')">All</button>
+      <button type="button" *ngFor="let cat of categories" class="cat-chip"
+        [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">{{ cat }}</button>
     </div>
+  </div>
 
-    <!-- Product cards -->
-    <div *ngIf="!loading && products.length > 0" class="products-grid">
-      <div *ngFor="let product of products"
-        class="product-card" (click)="openProduct(product._id)">
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-bar-inner">
+      <select [(ngModel)]="selectedCondition" (change)="onFilterChange()" class="filter-select" aria-label="Condition filter">
+        <option value="">Condition: All</option>
+        <option *ngFor="let c of conditions" [value]="c">{{ c }}</option>
+      </select>
+      <div class="price-range">
+        <input type="number" [(ngModel)]="minPrice" (input)="onFilterChange()"
+          placeholder="Min $" class="filter-price-input" min="0" aria-label="Minimum price">
+        <span class="price-sep">–</span>
+        <input type="number" [(ngModel)]="maxPrice" (input)="onFilterChange()"
+          placeholder="Max $" class="filter-price-input" min="0" aria-label="Maximum price">
+      </div>
+      <select [(ngModel)]="sort" (change)="onFilterChange()" class="filter-select" aria-label="Sort">
+        <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+  </div>
 
-        <div class="product-image-wrap">
-          <img [src]="product.imageUrl | img: 480" [alt]="product.name" class="product-image" loading="lazy">
+  <!-- Grid -->
+  <div class="browse-content">
+    <div class="browse-inner">
 
-          <!-- Sold badge -->
-          <div *ngIf="product.sold" class="sold-tag">SOLD</div>
-
-          <!-- Favorite heart -->
-          <button class="btn-heart" [class.favorited]="isFavorited(product._id)"
-            (click)="toggleFavorite(product._id, $event)" title="Save">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
-                [attr.fill]="isFavorited(product._id) ? '#FF6B35' : 'none'"
-                [attr.stroke]="isFavorited(product._id) ? '#FF6B35' : '#fff'"
-                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-
-          <!-- Owner delete -->
-          <button *ngIf="canDeleteProduct(product)" class="btn-delete-overlay"
-            (click)="deleteProduct(product._id, $event)" title="Delete listing">✕</button>
-        </div>
-
-        <div class="product-info">
-          <div class="product-price">{{ product.price | currency }}</div>
-          <div class="product-name">{{ product.name }}</div>
-          <div class="product-meta">
-            <span class="product-category">{{ product.category }}</span>
-            <span *ngIf="product.condition" class="product-condition">· {{ product.condition }}</span>
+      <!-- Skeletons while loading -->
+      <div *ngIf="loading" class="products-grid">
+        <div *ngFor="let _ of [1,2,3,4,5,6,7,8,9,10,11,12]" class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
           </div>
         </div>
       </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && products.length === 0" class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+        </div>
+        <h3>No listings found</h3>
+        <p *ngIf="searchQuery || selectedCategory || selectedCondition || minPrice || maxPrice">
+          Try adjusting your search or filters.
+        </p>
+        <p *ngIf="!searchQuery && !selectedCategory && !selectedCondition && !minPrice && !maxPrice">
+          Nothing here yet. <a routerLink="/add-product">Be the first to list an item.</a>
+        </p>
+      </div>
+
+      <!-- Product cards -->
+      <div *ngIf="!loading && products.length > 0" class="products-grid">
+        <div *ngFor="let product of products"
+          class="product-card" (click)="openProduct(product._id)"
+          role="button" tabindex="0"
+          (keydown.enter)="openProduct(product._id)"
+          (keydown.space)="$event.preventDefault(); openProduct(product._id)">
+
+          <div class="product-image-wrap">
+            <img [src]="product.imageUrl | img: 480" [alt]="product.name" class="product-image" loading="lazy">
+
+            <!-- Sold badge -->
+            <div *ngIf="product.sold" class="sold-tag">SOLD</div>
+
+            <!-- Favorite heart -->
+            <button type="button" class="btn-heart" [class.favorited]="isFavorited(product._id)"
+              (click)="toggleFavorite(product._id, $event)" [attr.aria-label]="isFavorited(product._id) ? 'Remove from favorites' : 'Save to favorites'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                  [attr.fill]="isFavorited(product._id) ? 'currentColor' : 'none'"
+                  stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <!-- Owner delete -->
+            <button type="button" *ngIf="canDeleteProduct(product)" class="btn-delete-overlay"
+              (click)="deleteProduct(product._id, $event)" aria-label="Delete listing">✕</button>
+          </div>
+
+          <div class="product-info">
+            <div class="product-price">{{ product.price | currency }}</div>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-meta">
+              <span class="product-category">{{ product.category }}</span>
+              <span *ngIf="product.condition" class="product-condition">· {{ product.condition }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading more indicator -->
+      <div *ngIf="loadingMore" class="loading-more">Loading more…</div>
+
+      <!-- Sentinel element for IntersectionObserver -->
+      <div #sentinel class="scroll-sentinel"></div>
+
     </div>
-
-    <!-- Loading more indicator -->
-    <div *ngIf="loadingMore" class="loading-more">Loading more…</div>
-
-    <!-- Sentinel element for IntersectionObserver -->
-    <div #sentinel class="scroll-sentinel"></div>
-
   </div>
 </div>

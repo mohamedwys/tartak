@@ -1,135 +1,164 @@
-.inq-wrap { max-width: 960px; }
+/* ==========================================================
+ * Dashboard — inquiries (seller inbox)
+ * ========================================================== */
 
-.inq-header { margin-bottom: 16px; }
-.inq-title { margin: 0; font-size: 22px; color: #1b2332; }
-.inq-subtitle { margin: 4px 0 0; color: #6b7588; font-size: 14px; }
+.inq-wrap { max-width: 1040px; }
+
+.inq-header { margin-bottom: var(--space-4); }
+.inq-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-3xl);
+}
+.inq-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+}
 
 .inq-filters {
   display: flex;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
 }
 .inq-filter {
-  background: #fff;
-  border: 1px solid #d5dbe6;
-  padding: 7px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  color: #48536a;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   cursor: pointer;
+  font-family: inherit;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+  min-height: 36px;
+  font-weight: 500;
 }
-.inq-filter:hover { background: #f1f3f8; }
+.inq-filter:hover { background: var(--surface-2); color: var(--text-primary); }
 .inq-filter.active {
-  background: #1b2332;
-  color: #fff;
-  border-color: #1b2332;
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  border-color: var(--text-primary);
 }
 
-.inq-status { padding: 20px 0; color: #6b7588; }
-.inq-status-error { color: #b33a3a; }
+.inq-status {
+  padding: var(--space-6) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+.inq-status-error { color: var(--error-500); }
 
 .inq-empty {
-  background: #fff;
-  border: 1px dashed #d5dbe6;
-  border-radius: 10px;
-  padding: 40px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6);
   text-align: center;
-  color: #6b7588;
+  color: var(--text-secondary);
 }
 .inq-empty-title {
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1b2332;
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
 }
-.inq-empty p { margin: 0; font-size: 14px; }
+.inq-empty p { margin: 0; font-size: var(--text-base); }
 
 .inq-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  background: #fff;
-  border: 1px solid #e3e7ee;
-  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-xs);
 }
 .inq-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid #f1f3f8;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
 }
-.inq-row:last-child { border-bottom: none; }
-.inq-row:hover { background: #f7f9fc; }
-.inq-row-unread { background: #f3f7ff; }
-.inq-row-unread:hover { background: #eaf1ff; }
+.inq-row:last-child { border-bottom: 0; }
+.inq-row:hover { background: var(--surface-2); }
+.inq-row-unread { background: var(--brand-100); }
+.inq-row-unread:hover { background: var(--brand-100); filter: brightness(0.98); }
 
 .inq-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
 }
-.inq-thumb-placeholder { background: #e3e7ee; }
+.inq-thumb-placeholder { background: var(--surface-2); }
 
-.inq-main {
-  flex: 1;
-  min-width: 0;
-}
+.inq-main { flex: 1; min-width: 0; }
 .inq-row-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   margin-bottom: 3px;
 }
 .inq-buyer {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-width: 0;
 }
 .inq-avatar, .inq-avatar-img {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
   font-size: 10px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #1b2332;
-  color: #fff;
+  background: var(--brand-900);
+  color: var(--text-inverse);
   object-fit: cover;
   flex-shrink: 0;
 }
 .inq-buyer-name {
-  font-weight: 500;
-  color: #1b2332;
-  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .inq-product {
-  font-size: 13px;
-  color: #6b7588;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .inq-time {
-  font-size: 11px;
-  color: #8a93a8;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .inq-preview {
-  font-size: 13px;
-  color: #48536a;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -138,22 +167,22 @@
 .inq-badges {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-1);
   align-items: flex-end;
   flex-shrink: 0;
 }
 .inq-badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: var(--text-xs);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
   font-weight: 600;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.02em;
 }
 .inq-badge-unread {
-  background: #2f5bb7;
-  color: #fff;
+  background: var(--brand-900);
+  color: var(--text-inverse);
 }
 .inq-badge-offer {
-  background: #fef1da;
-  color: #8a5b18;
+  background: var(--warning-100);
+  color: var(--warning-500);
 }

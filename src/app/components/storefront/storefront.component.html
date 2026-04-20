@@ -1,4 +1,4 @@
-<div class="store-page">
+<div class="store-page zellige-backdrop">
 
   <div *ngIf="loading" class="store-loading">
     <div class="sk-hero"></div>
@@ -14,10 +14,10 @@
   </div>
 
   <ng-container *ngIf="!loading && !error && org">
-    <!-- Banner -->
+    <!-- Banner (full-bleed) -->
     <section class="store-banner" [style.background]="heroBackground">
       <div class="store-banner-overlay" *ngIf="bannerStyle === 'image'"></div>
-      <div class="store-logo" [style.borderColor]="accentColor">
+      <div class="store-logo">
         <img *ngIf="org.logoUrl" [src]="org.logoUrl | img: 240" [alt]="org.name">
         <span *ngIf="!org.logoUrl">{{ orgInitials }}</span>
       </div>
@@ -27,17 +27,17 @@
     <header class="store-header">
       <h1 class="store-name">
         {{ org.name }}
-        <svg *ngIf="isVerified" class="store-verified" width="20" height="20" viewBox="0 0 24 24" fill="none" [attr.aria-label]="'Verified business'">
-          <path d="M12 2l2.39 2.06 3.11-.66.66 3.11L20.2 9 18.16 11l2.04 2-2.04 2 .66 3.11-3.11-.66L12 19.94 9.61 17.88l-3.11.66-.66-3.11L3.8 13l2.04-2L3.8 9l2.04-2.49-.66-3.11 3.11.66z" [attr.fill]="accentColor"/>
+        <svg *ngIf="isVerified" class="store-verified" width="24" height="24" viewBox="0 0 24 24" fill="none" [attr.aria-label]="'Verified business'">
+          <path d="M12 2l2.39 2.06 3.11-.66.66 3.11L20.2 9 18.16 11l2.04 2-2.04 2 .66 3.11-3.11-.66L12 19.94 9.61 17.88l-3.11.66-.66-3.11L3.8 13l2.04-2L3.8 9l2.04-2.49-.66-3.11 3.11.66z" fill="currentColor" style="color: var(--accent-700)"/>
           <path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </h1>
+      <p *ngIf="org.bio" class="store-tagline">{{ org.bio }}</p>
       <div *ngIf="ratingCount > 0" class="store-rating">
         <span class="store-stars">
-          <svg *ngFor="let i of stars(5)" width="14" height="14" viewBox="0 0 24 24">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-              [attr.fill]="i < (ratingAverage ?? 0) ? accentColor : '#d5dbe6'"
-              stroke="none"/>
+          <svg *ngFor="let i of stars(5)" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+               [style.color]="i < (ratingAverage ?? 0) ? 'var(--accent-700)' : 'var(--border-strong)'">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
         </span>
         <span class="store-rating-text">
@@ -47,22 +47,20 @@
     </header>
 
     <!-- Tabs -->
-    <div class="store-tabs">
-      <button class="store-tab" [class.active]="activeTab === 'listings'"
-        [style.borderColor]="activeTab === 'listings' ? accentColor : 'transparent'"
-        (click)="setTab('listings')">Listings</button>
-      <button class="store-tab" [class.active]="activeTab === 'about'"
-        [style.borderColor]="activeTab === 'about' ? accentColor : 'transparent'"
-        (click)="setTab('about')">About</button>
+    <div class="store-tabs" role="tablist">
+      <button class="store-tab" role="tab" [attr.aria-selected]="activeTab === 'listings'"
+              [class.active]="activeTab === 'listings'" (click)="setTab('listings')">Listings</button>
+      <button class="store-tab" role="tab" [attr.aria-selected]="activeTab === 'about'"
+              [class.active]="activeTab === 'about'" (click)="setTab('about')">About</button>
     </div>
 
     <!-- Listings tab -->
-    <section *ngIf="activeTab === 'listings'" class="store-listings">
+    <section *ngIf="activeTab === 'listings'" class="store-listings" role="tabpanel">
       <div *ngIf="!products.length" class="store-empty">
         This storefront has no active listings yet.
       </div>
       <div *ngIf="products.length" class="store-grid">
-        <div *ngFor="let p of products" class="store-card" (click)="openProduct(p._id)">
+        <button *ngFor="let p of products" type="button" class="store-card" (click)="openProduct(p._id)">
           <div class="store-card-img">
             <img *ngIf="p.imageUrl" [src]="p.imageUrl | img: 480" [alt]="p.name" loading="lazy">
           </div>
@@ -71,12 +69,12 @@
             <div class="store-card-name">{{ p.name }}</div>
             <div class="store-card-meta">{{ p.category }}</div>
           </div>
-        </div>
+        </button>
       </div>
     </section>
 
     <!-- About tab -->
-    <section *ngIf="activeTab === 'about'" class="store-about">
+    <section *ngIf="activeTab === 'about'" class="store-about" role="tabpanel">
       <div class="store-about-block" *ngIf="org.bio">
         <h2>About {{ org.name }}</h2>
         <p class="store-bio">{{ org.bio }}</p>
@@ -94,19 +92,20 @@
         </ul>
       </div>
 
-      <div class="store-about-block" *ngIf="storefront?.policies?.contact">
-        <h2>How to reach us</h2>
-        <p class="store-policy">{{ storefront?.policies?.contact }}</p>
-      </div>
-
-      <div class="store-about-block" *ngIf="storefront?.policies?.shipping">
-        <h2>Shipping</h2>
-        <p class="store-policy">{{ storefront?.policies?.shipping }}</p>
-      </div>
-
-      <div class="store-about-block" *ngIf="storefront?.policies?.returns">
-        <h2>Returns</h2>
-        <p class="store-policy">{{ storefront?.policies?.returns }}</p>
+      <div class="store-policies-row"
+           *ngIf="storefront?.policies?.shipping || storefront?.policies?.returns || storefront?.policies?.contact">
+        <div class="store-about-block" *ngIf="storefront?.policies?.shipping">
+          <h2>Shipping</h2>
+          <p class="store-policy">{{ storefront?.policies?.shipping }}</p>
+        </div>
+        <div class="store-about-block" *ngIf="storefront?.policies?.returns">
+          <h2>Returns</h2>
+          <p class="store-policy">{{ storefront?.policies?.returns }}</p>
+        </div>
+        <div class="store-about-block" *ngIf="storefront?.policies?.contact">
+          <h2>How to reach us</h2>
+          <p class="store-policy">{{ storefront?.policies?.contact }}</p>
+        </div>
       </div>
 
       <div *ngIf="!org.bio && !org.website && !org.supportEmail
@@ -116,5 +115,9 @@
         This storefront has not published any information yet.
       </div>
     </section>
+
+    <footer class="store-footer">
+      Powered by Qwiksell — trusted marketplace for independent businesses.
+    </footer>
   </ng-container>
 </div>

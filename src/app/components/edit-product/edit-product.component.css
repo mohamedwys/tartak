@@ -1,101 +1,185 @@
-.form-page { padding: 32px 24px; background: var(--bg); min-height: calc(100vh - 60px); }
-.form-inner { max-width: 640px; margin: 0 auto; }
+/* ==========================================================
+ * Edit product — shares patterns with add-product
+ * ========================================================== */
 
-.form-header { margin-bottom: 28px; }
-.back-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
-  margin-bottom: 12px; transition: color 0.15s; text-decoration: none;
+.form-page {
+  padding: var(--space-8) var(--space-6);
+  background: var(--bg);
+  min-height: calc(100vh - 68px);
 }
-.back-link:hover { color: var(--text); }
+.form-inner { max-width: 720px; margin: 0 auto; }
 
-.form-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--text); margin-bottom: 4px; letter-spacing: -0.02em; }
-.form-sub { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+.form-header { margin-bottom: var(--space-8); }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-3);
+  transition: color var(--duration-fast) var(--ease-out);
+  text-decoration: none;
+}
+.back-link:hover { color: var(--brand-900); }
+
+.form-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-3xl);
+}
+.form-sub {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
 
 .form-card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-8);
 }
 
-.field { margin-bottom: 18px; }
-.field label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.field { margin-bottom: var(--space-4); }
+.field label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
 .field input, .field textarea, .field select {
   width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem; font-weight: 500; color: var(--text);
-  background: #fff; font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: var(--surface);
+  font-family: inherit;
+  min-height: 44px;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
-.field textarea { resize: vertical; min-height: 100px; }
-.field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+.field textarea { resize: vertical; min-height: 120px; line-height: var(--leading-lg); }
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%236b6660' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  padding-right: 40px;
+  cursor: pointer;
+}
 .field input:focus, .field textarea:focus, .field select:focus {
-  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,101,52,0.1);
+  border-color: var(--accent-700);
+  box-shadow: var(--ring);
 }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
 
 .price-input-wrap { position: relative; }
-.price-symbol { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted); pointer-events: none; }
-.price-input-wrap input { padding-left: 26px; }
+.price-symbol {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+.price-input-wrap input { padding-left: 32px; }
 
 .image-preview {
-  margin-bottom: 18px;
-  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--border);
-  aspect-ratio: 16/9;
-  background: var(--bg);
+  aspect-ratio: 16 / 9;
+  background: var(--surface-2);
 }
 .image-preview img { width: 100%; height: 100%; object-fit: cover; }
 
 .error-msg {
-  color: var(--danger); font-size: 0.85rem; font-weight: 600;
-  margin-bottom: 14px; padding: 10px 12px;
-  background: #fff0f0; border-radius: var(--radius-sm);
+  color: var(--error-500);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--error-100);
+  border: 1px solid var(--error-500);
+  border-radius: var(--radius-md);
 }
 
 .btn-submit {
   width: 100%;
-  padding: 13px;
-  background: var(--primary); color: #fff;
-  border: none; border-radius: var(--radius-sm);
-  font-size: 0.95rem; font-weight: 800;
-  cursor: pointer; transition: background 0.15s; font-family: inherit;
+  padding: var(--space-4);
+  background: var(--brand-900);
+  color: var(--text-inverse);
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+  font-family: inherit;
+  min-height: 48px;
 }
-.btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
-.btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+.btn-submit:hover:not(:disabled) { background: var(--brand-700); }
+.btn-submit:disabled { background: var(--surface-2); color: var(--text-muted); cursor: not-allowed; }
 
 .additional-photo {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-top: 12px;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
-.additional-photo app-image-upload {
-  flex: 1;
-}
+.additional-photo app-image-upload { flex: 1; }
+
 .btn-remove-photo {
-  background: none;
-  border: 1px solid #ddd;
-  color: #888;
-  padding: 6px 12px;
-  font-size: 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
   cursor: pointer;
-  margin-top: 4px;
+  margin-top: var(--space-1);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+  min-height: 36px;
 }
-.btn-remove-photo:hover { border-color: #c00; color: #c00; }
+.btn-remove-photo:hover { border-color: var(--error-500); color: var(--error-500); }
+
 .btn-add-photo {
-  margin-top: 10px;
-  background: none;
-  border: 1px dashed #ccc;
-  color: #888;
-  padding: 8px 16px;
-  font-size: 0.85rem;
+  margin-top: var(--space-3);
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  color: var(--text-secondary);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
   cursor: pointer;
   width: 100%;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+  min-height: 44px;
 }
-.btn-add-photo:hover { border-color: #222; color: #222; }
+.btn-add-photo:hover {
+  border-color: var(--brand-900);
+  color: var(--brand-900);
+  background: var(--brand-100);
+}
+
+@media (max-width: 600px) {
+  .form-card { padding: var(--space-6); }
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+}
