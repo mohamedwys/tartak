@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ReportService } from '../../services/report.service';
 import { CartService } from '../../services/cart.service';
+import { CategoryService, CategoryNode } from '../../services/category.service';
 import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
@@ -31,6 +32,9 @@ export class ProductDetailComponent implements OnInit {
   sendingMessage = false;
   messageSent = false;
   messageError = '';
+
+  // Breadcrumb (populated from the taxonomy when product has categoryId).
+  categoryCrumbs: { _id: string; slug: string; name: string }[] = [];
 
   // Carousel
   activePhotoIndex = 0;
@@ -87,6 +91,7 @@ export class ProductDetailComponent implements OnInit {
     private toastService: ToastService,
     private reportService: ReportService,
     private cartService: CartService,
+    private categoryService: CategoryService,
   ) {}
 
   // Pro products have an org_id → part of a business catalog.
@@ -136,11 +141,33 @@ export class ProductDetailComponent implements OnInit {
         this.checkOwnership();
         this.loadOtherListings();
         this.loadSimilarListings();
+        this.loadCategoryCrumbs();
         if (this.isLoggedIn) {
           this.checkFavorited();
         }
       },
       error: () => { this.error = 'Listing not found.'; this.loading = false; }
+    });
+  }
+
+  // Resolve the taxonomy chain for the breadcrumb. If the product has no
+  // categoryId (legacy row, not backfilled), leave `categoryCrumbs` empty
+  // and the template will fall back to the flat text breadcrumb.
+  private loadCategoryCrumbs(): void {
+    this.categoryCrumbs = [];
+    const catId = this.product?.categoryId;
+    if (!catId) return;
+    this.categoryService.getTree().subscribe({
+      next: () => {
+        const node = this.categoryService.findById(catId);
+        if (!node) return;
+        const ancestors = this.categoryService.ancestorsOf(catId);
+        this.categoryCrumbs = [
+          ...ancestors.map((a: CategoryNode) => ({ _id: a._id, slug: a.slug, name: a.name })),
+          { _id: node._id, slug: node.slug, name: node.name },
+        ];
+      },
+      error: () => {},
     });
   }
 

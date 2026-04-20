@@ -24,12 +24,24 @@
     </div>
   </div>
 
-  <!-- Category chips -->
-  <div class="categories-bar">
+  <!-- Legacy text-category chips — Pro mode only (back-compat) -->
+  <div *ngIf="isPro()" class="categories-bar">
     <div class="categories-inner">
       <button type="button" class="cat-chip" [class.active]="selectedCategory === ''" (click)="selectCategory('')">All</button>
       <button type="button" *ngFor="let cat of categories" class="cat-chip"
         [class.active]="selectedCategory === cat" (click)="selectCategory(cat)">{{ cat }}</button>
+    </div>
+  </div>
+
+  <!-- Marketplace: taxonomy-backed pill row (top-level only).
+       Clicking an active pill clears the filter. -->
+  <div *ngIf="isMarketplace() && topCategories.length > 0" class="categories-bar mp-categories-bar">
+    <div class="categories-inner">
+      <button type="button" class="cat-chip" [class.active]="selectedCategoryId === null"
+        (click)="clearMarketplaceCategory()">All</button>
+      <button type="button" *ngFor="let c of topCategories" class="cat-chip"
+        [class.active]="selectedCategoryId === c._id"
+        (click)="selectMarketplaceCategory(c._id)">{{ c.name }}</button>
     </div>
   </div>
 

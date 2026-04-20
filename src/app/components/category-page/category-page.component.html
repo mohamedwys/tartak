@@ -1,0 +1,120 @@
+<div class="category-page">
+
+  <!-- Not found -->
+  <div *ngIf="notFound" class="empty-state">
+    <h3>Category not found</h3>
+    <p><a routerLink="/">Go back to browse</a></p>
+  </div>
+
+  <ng-container *ngIf="!notFound && detail">
+    <!-- Breadcrumb: Pro > Electronics > Mobiles & Accessories -->
+    <nav class="cat-breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/" class="crumb">Pro</a>
+      <ng-container *ngFor="let a of detail.ancestors">
+        <span class="crumb-sep" aria-hidden="true">›</span>
+        <a [routerLink]="['/c', a.slug]" class="crumb">{{ a.name }}</a>
+      </ng-container>
+      <span class="crumb-sep" aria-hidden="true">›</span>
+      <span class="crumb crumb-current">{{ detail.category.name }}</span>
+    </nav>
+
+    <!-- Title -->
+    <header class="cat-hero">
+      <h1 class="cat-title">{{ detail.category.name }}</h1>
+    </header>
+
+    <!-- Sub-category pills -->
+    <div *ngIf="detail.children.length > 0" class="subcat-pills">
+      <a *ngFor="let c of detail.children" [routerLink]="['/c', c.slug]" class="subcat-pill">
+        {{ c.name }}
+      </a>
+    </div>
+
+    <!-- Trimmed filter bar (search / price / sort) -->
+    <div class="cat-filter-bar">
+      <div class="cat-filter-inner">
+        <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
+               placeholder="Search within {{ detail.category.name }}…"
+               class="filter-search-input" aria-label="Search">
+        <div class="price-range">
+          <input type="number" [(ngModel)]="minPrice" (input)="onFilterChange()"
+                 placeholder="Min $" class="filter-price-input" min="0" aria-label="Minimum price">
+          <span class="price-sep">–</span>
+          <input type="number" [(ngModel)]="maxPrice" (input)="onFilterChange()"
+                 placeholder="Max $" class="filter-price-input" min="0" aria-label="Maximum price">
+        </div>
+        <select [(ngModel)]="sort" (change)="onFilterChange()" class="filter-select" aria-label="Sort">
+          <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="browse-content">
+      <div class="browse-inner">
+
+        <div *ngIf="loading" class="products-grid grid-pro">
+          <div *ngFor="let _ of [1,2,3,4,5,6,7,8,9,10,11,12]" class="skeleton-card">
+            <div class="skeleton-img"></div>
+            <div class="skeleton-body">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!loading && products.length === 0" class="empty-state">
+          <h3>No listings in this category yet.</h3>
+        </div>
+
+        <div *ngIf="!loading && products.length > 0" class="products-grid grid-pro">
+          <div *ngFor="let product of products"
+               class="product-card product-card-pro" (click)="openProduct(product._id)"
+               role="button" tabindex="0"
+               (keydown.enter)="openProduct(product._id)"
+               (keydown.space)="$event.preventDefault(); openProduct(product._id)">
+
+            <div class="product-image-wrap aspect-1x1">
+              <img [src]="product.imageUrl | img: 480" [alt]="product.name"
+                   class="product-image" loading="lazy">
+
+              <div *ngIf="product.sold" class="sold-tag">SOLD</div>
+
+              <button type="button" class="btn-heart"
+                      [class.favorited]="isFavorited(product._id)"
+                      (click)="toggleFavorite(product._id, $event)"
+                      [attr.aria-label]="isFavorited(product._id) ? 'Remove from favorites' : 'Save to favorites'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"
+                        [attr.fill]="isFavorited(product._id) ? 'currentColor' : 'none'"
+                        stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+
+              <button type="button" *ngIf="canDeleteProduct(product)"
+                      class="btn-delete-overlay"
+                      (click)="deleteProduct(product._id, $event)"
+                      aria-label="Delete listing">✕</button>
+            </div>
+
+            <div class="product-info">
+              <div class="product-price">{{ product.price | currency }}</div>
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-meta">
+                <a *ngIf="orgName(product) && orgSlug(product)" class="product-org"
+                   (click)="openStorefront(orgSlug(product)!, $event)">{{ orgName(product) }}</a>
+                <span *ngIf="orgName(product) && !orgSlug(product)" class="product-org">{{ orgName(product) }}</span>
+                <span class="product-category chip">{{ product.category }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="loadingMore" class="loading-more">Loading more…</div>
+        <div #sentinel class="scroll-sentinel"></div>
+
+      </div>
+    </div>
+  </ng-container>
+</div>

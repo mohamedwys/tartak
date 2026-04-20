@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
+import { CategoryService, CategoryNode } from '../../services/category.service';
 import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
@@ -9,7 +10,7 @@ import { decodeJwtPayload } from '../../utils/jwt';
   templateUrl: './add-product.component.html',
   styleUrls: ['./add-product.component.css']
 })
-export class AddProductComponent {
+export class AddProductComponent implements OnInit {
   name = '';
   description = '';
   price: number | null = null;
@@ -19,10 +20,63 @@ export class AddProductComponent {
   condition = '';
   submitting = false;
 
-  categories = ['Electronics', 'Furniture', 'Clothing', 'Sports', 'Music', 'Photography', 'Home & Garden'];
+  // Cascading category picker — top-level choice drives the subcategory
+  // list. When a subcategory is chosen, we submit both category_id (leaf)
+  // and category (leaf name) to keep back-compat with text filters.
+  categoryTree: CategoryNode[] = [];
+  selectedTopId: string | null = null;
+  selectedSubId: string | null = null;
+
   conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
 
-  constructor(private productService: ProductService, private router: Router, private toastService: ToastService) {}
+  constructor(
+    private productService: ProductService,
+    private router: Router,
+    private toastService: ToastService,
+    private categoryService: CategoryService,
+  ) {}
+
+  ngOnInit(): void {
+    this.categoryService.getTree().subscribe({
+      next: (tree) => { this.categoryTree = tree ?? []; },
+      error: () => { this.categoryTree = []; },
+    });
+  }
+
+  get topCategory(): CategoryNode | null {
+    return this.selectedTopId
+      ? (this.categoryTree.find(c => c._id === this.selectedTopId) ?? null)
+      : null;
+  }
+
+  get subCategories(): CategoryNode[] {
+    return this.topCategory?.children ?? [];
+  }
+
+  onTopCategoryChange(): void {
+    // Reset the sub-selection whenever the top-level changes so we don't
+    // leave a stale leaf id paired with a different parent.
+    this.selectedSubId = null;
+    this.syncCategoryFields();
+  }
+
+  onSubCategoryChange(): void { this.syncCategoryFields(); }
+
+  // Keep the text `category` mirror in sync with whichever leaf is picked
+  // (sub wins; top is the fallback). This preserves the legacy filter.
+  private syncCategoryFields(): void {
+    const top = this.topCategory;
+    const sub = this.selectedSubId
+      ? (this.subCategories.find(c => c._id === this.selectedSubId) ?? null)
+      : null;
+    if (sub) { this.category = sub.name; return; }
+    if (top) { this.category = top.name; return; }
+    this.category = '';
+  }
+
+  private selectedLeafId(): string | null {
+    return this.selectedSubId ?? this.selectedTopId ?? null;
+  }
 
   onPhotoUploaded(url: string): void {
     if (!this.imageUrl) {
@@ -56,6 +110,8 @@ export class AddProductComponent {
       imageUrl: this.imageUrl,
       imageUrls: this.imageUrls.filter(u => u),
     };
+    const leafId = this.selectedLeafId();
+    if (leafId) product.categoryId = leafId;
     if (this.condition) product.condition = this.condition;
     this.productService.createProduct(product).subscribe({
       next: () => {

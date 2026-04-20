@@ -15,11 +15,13 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
 import { StorefrontComponent } from './components/storefront/storefront.component';
+import { CategoryPageComponent } from './components/category-page/category-page.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   { path: '',                              component: ProductListComponent, data: { mode: 'pro' } },
   { path: 'marketplace',                   component: ProductListComponent, data: { mode: 'marketplace' } },
+  { path: 'c/:slug',                       component: CategoryPageComponent, data: { mode: 'pro' } },
   { path: 'product/:id',                   component: ProductDetailComponent },
   { path: 'login',                         component: LoginComponent },
   { path: 'register',                      component: RegisterComponent },

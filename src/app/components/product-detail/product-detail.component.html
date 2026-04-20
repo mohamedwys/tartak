@@ -3,8 +3,22 @@
   <!-- Breadcrumb -->
   <nav *ngIf="!loading && product" class="detail-breadcrumb" aria-label="Breadcrumb">
     <a [routerLink]="modePath()" class="crumb">{{ modeLabel() }}</a>
-    <span class="crumb-sep" aria-hidden="true">›</span>
-    <span class="crumb">{{ product.category }}</span>
+
+    <!-- Taxonomy-aware chain when the product has a categoryId.
+         Intermediate crumbs link to /c/:slug; in Marketplace mode they
+         remain static labels to keep it a flat experience. -->
+    <ng-container *ngIf="categoryCrumbs.length > 0; else flatCrumb">
+      <ng-container *ngFor="let c of categoryCrumbs">
+        <span class="crumb-sep" aria-hidden="true">›</span>
+        <a *ngIf="isProProduct()" [routerLink]="['/c', c.slug]" class="crumb">{{ c.name }}</a>
+        <span *ngIf="!isProProduct()" class="crumb">{{ c.name }}</span>
+      </ng-container>
+    </ng-container>
+    <ng-template #flatCrumb>
+      <span class="crumb-sep" aria-hidden="true">›</span>
+      <span class="crumb">{{ product.category }}</span>
+    </ng-template>
+
     <span class="crumb-sep" aria-hidden="true">›</span>
     <span class="crumb crumb-current">{{ product.name }}</span>
   </nav>

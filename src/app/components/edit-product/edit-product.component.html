@@ -30,12 +30,29 @@
             <input type="number" [(ngModel)]="product.price" name="price" placeholder="0.00" min="0" step="0.01">
           </div>
         </div>
-        <div class="field">
+        <div class="field" *ngIf="!showLegacyCategoryHint">
           <label>Category</label>
-          <select [(ngModel)]="product.category" name="category">
-            <option value="">Select a category</option>
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          <select [(ngModel)]="selectedTopId" name="topCategory"
+                  (change)="onTopCategoryChange()">
+            <option [ngValue]="null">Select a category</option>
+            <option *ngFor="let c of categoryTree" [ngValue]="c._id">{{ c.name }}</option>
           </select>
+        </div>
+        <div class="field" *ngIf="!showLegacyCategoryHint && subCategories.length > 0">
+          <label>Subcategory</label>
+          <select [(ngModel)]="selectedSubId" name="subCategory"
+                  (change)="onSubCategoryChange()">
+            <option [ngValue]="null">Select a subcategory</option>
+            <option *ngFor="let c of subCategories" [ngValue]="c._id">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="field" *ngIf="showLegacyCategoryHint">
+          <label>Category</label>
+          <input type="text" [value]="product.category || ''" readonly
+                 aria-label="Legacy category" class="legacy-category-input">
+          <button type="button" class="link-btn" (click)="unlockCategoryPicker()">
+            Pick from categories
+          </button>
         </div>
         <div class="field">
           <label>Condition</label>

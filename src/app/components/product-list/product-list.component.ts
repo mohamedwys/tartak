@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { AuthService } from '../../services/auth.service';
+import { CategoryService, CategoryNode } from '../../services/category.service';
 import { decodeJwtPayload } from '../../utils/jwt';
 
 export type ListingMode = 'pro' | 'marketplace';
@@ -35,6 +36,9 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   categories = ['Electronics', 'Furniture', 'Clothing', 'Sports', 'Music', 'Photography', 'Home & Garden'];
   conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
+  // Marketplace-mode category pill row (top-level only from the taxonomy).
+  topCategories: CategoryNode[] = [];
+  selectedCategoryId: string | null = null;
   sortOptions = [
     { value: 'newest',     label: 'Newest' },
     { value: 'price_asc',  label: 'Price: Low to High' },
@@ -48,6 +52,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     private productService: ProductService,
     private favoriteService: FavoriteService,
     private authService: AuthService,
+    private categoryService: CategoryService,
     private router: Router,
     private route: ActivatedRoute,
   ) {}
@@ -68,6 +73,11 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
         error: () => {}
       });
     }
+    // Load the shared category tree so Marketplace can render its pill row.
+    this.categoryService.getTree().subscribe({
+      next: (tree) => { this.topCategories = tree ?? []; },
+      error: () => { this.topCategories = []; },
+    });
   }
 
   ngAfterViewInit(): void {
@@ -89,6 +99,18 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     // across (e.g. condition set in Marketplace shouldn't follow to Pro).
     this.selectedCondition = '';
     this.location = '';
+    this.selectedCategoryId = null;
+  }
+
+  selectMarketplaceCategory(categoryId: string): void {
+    this.selectedCategoryId = this.selectedCategoryId === categoryId ? null : categoryId;
+    this.loadPage(1, true);
+  }
+
+  clearMarketplaceCategory(): void {
+    if (this.selectedCategoryId === null) return;
+    this.selectedCategoryId = null;
+    this.loadPage(1, true);
   }
 
   isMarketplace(): boolean { return this.mode === 'marketplace'; }
@@ -99,6 +121,10 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.searchQuery)      p['q']         = this.searchQuery;
     if (this.selectedCategory) p['category']  = this.selectedCategory;
     if (this.isMarketplace() && this.selectedCondition) p['condition'] = this.selectedCondition;
+    if (this.isMarketplace() && this.selectedCategoryId) {
+      p['categoryId'] = this.selectedCategoryId;
+      p['includeDescendants'] = 'true';
+    }
     if (this.minPrice)         p['minPrice']  = this.minPrice;
     if (this.maxPrice)         p['maxPrice']  = this.maxPrice;
     return p;

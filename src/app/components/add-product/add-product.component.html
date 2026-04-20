@@ -32,9 +32,18 @@
           </div>
           <div class="field">
             <label>Category</label>
-            <select [(ngModel)]="category" name="category">
-              <option value="">Select a category</option>
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            <select [(ngModel)]="selectedTopId" name="topCategory"
+                    (change)="onTopCategoryChange()">
+              <option [ngValue]="null">Select a category</option>
+              <option *ngFor="let c of categoryTree" [ngValue]="c._id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="field" *ngIf="subCategories.length > 0">
+            <label>Subcategory</label>
+            <select [(ngModel)]="selectedSubId" name="subCategory"
+                    (change)="onSubCategoryChange()">
+              <option [ngValue]="null">Select a subcategory</option>
+              <option *ngFor="let c of subCategories" [ngValue]="c._id">{{ c.name }}</option>
             </select>
           </div>
           <div class="field">

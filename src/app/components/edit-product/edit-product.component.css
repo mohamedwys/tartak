@@ -183,3 +183,26 @@
   .form-card { padding: var(--space-6); }
   .form-row { grid-template-columns: 1fr; gap: 0; }
 }
+
+/* Legacy (pre-taxonomy) products: show the old text value as a static
+   read-only hint with an inline link to switch into the picker. */
+.legacy-category-input {
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  width: 100%;
+}
+.link-btn {
+  margin-top: var(--space-2);
+  background: none;
+  border: 0;
+  color: var(--brand-900);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}

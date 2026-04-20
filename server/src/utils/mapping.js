@@ -97,6 +97,7 @@ export function toProduct(row, owner) {
     description: row.description,
     price: Number(row.price),
     category: row.category,
+    categoryId: row.category_id ?? null,
     condition: row.condition ?? null,
     imageUrl: row.image_url,
     imageUrls: row.image_urls ?? [],

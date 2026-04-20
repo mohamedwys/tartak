@@ -20,6 +20,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { OnboardingBusinessComponent } from './components/onboarding-business/onboarding-business.component';
 import { StorefrontComponent } from './components/storefront/storefront.component';
+import { CategoryPageComponent } from './components/category-page/category-page.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { ImageUploadComponent } from './components/image-upload/image-upload.component';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
@@ -44,6 +45,7 @@ import { AuthGuard } from './guards/auth.guard';
     ResetPasswordComponent,
     OnboardingBusinessComponent,
     StorefrontComponent,
+    CategoryPageComponent,
     ToastComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImagePipe, ImageUploadComponent],

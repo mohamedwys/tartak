@@ -4,6 +4,7 @@ import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 import { MessageService } from './services/message.service';
 import { OrgService, Organization } from './services/org.service';
+import { CategoryService, CategoryNode } from './services/category.service';
 import { decodeJwtPayload } from './utils/jwt';
 
 @Component({
@@ -19,12 +20,18 @@ export class AppComponent implements OnInit {
   currentOrgId: string | null = null;
   myOrgs: Organization[] = [];
   accountMenuOpen = false;
+  // Top-nav category bar (Pro mode only). We split into a visible row of
+  // up to `visibleCategoryLimit` and an overflow "More ▾" dropdown.
+  topCategories: CategoryNode[] = [];
+  visibleCategoryLimit = 8;
+  moreMenuOpen = false;
   private onboardingCheckedFor = '';
 
   constructor(
     private authService: AuthService,
     private messageService: MessageService,
     private orgService: OrgService,
+    private categoryService: CategoryService,
     private router: Router,
   ) {}
 
@@ -35,7 +42,29 @@ export class AppComponent implements OnInit {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => this.refresh());
+
+    // Fetch the category tree once up front — cached by the service for
+    // subsequent callers (category pages, product detail breadcrumb, etc.).
+    this.categoryService.getTree().subscribe({
+      next: (tree) => { this.topCategories = tree ?? []; },
+      error: () => { this.topCategories = []; },
+    });
   }
+
+  get visibleTopCategories(): CategoryNode[] {
+    return this.topCategories.slice(0, this.visibleCategoryLimit);
+  }
+
+  get overflowTopCategories(): CategoryNode[] {
+    return this.topCategories.slice(this.visibleCategoryLimit);
+  }
+
+  toggleMoreMenu(event?: Event): void {
+    event?.stopPropagation();
+    this.moreMenuOpen = !this.moreMenuOpen;
+  }
+
+  closeMoreMenu(): void { this.moreMenuOpen = false; }
 
   private refresh(): void {
     if (!this.authService.isLoggedIn()) {
@@ -126,6 +155,7 @@ export class AppComponent implements OnInit {
   @HostListener('document:click')
   closeMenus(): void {
     this.accountMenuOpen = false;
+    this.moreMenuOpen = false;
   }
 
   switchTo(orgId: string | null): void {

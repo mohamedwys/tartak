@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { roleAtLeast } from '../middleware/org.js';
 import { asyncHandler, HttpError } from '../utils/async.js';
 import { toProduct } from '../utils/mapping.js';
+import { resolveCategoryDescendantIds } from './categories.routes.js';
 
 const router = Router();
 
@@ -13,6 +14,9 @@ const productWriteSchema = z.object({
   description: z.string().trim().min(1).max(5000),
   price: z.coerce.number().nonnegative(),
   category: z.string().trim().min(1).max(80),
+  // New: optional FK into the categories table. Kept alongside the
+  // legacy `category` text for back-compat.
+  categoryId: z.string().uuid().optional().nullable(),
   condition: z.string().trim().max(40).optional().nullable(),
   imageUrl: z.string().url(),
   imageUrls: z.array(z.string().url()).optional().default([]),
@@ -35,6 +39,20 @@ router.get('/', asyncHandler(async (req, res) => {
   if (req.query.condition) q = q.eq('condition', String(req.query.condition));
   if (req.query.minPrice)  q = q.gte('price', Number(req.query.minPrice));
   if (req.query.maxPrice)  q = q.lte('price', Number(req.query.maxPrice));
+
+  // Category tree filter. If includeDescendants is true, resolve the
+  // full descendant id set server-side and filter with `.in()`. Without
+  // includeDescendants, we just match the exact category_id.
+  if (req.query.categoryId) {
+    const catId = String(req.query.categoryId);
+    const includeDesc = String(req.query.includeDescendants ?? 'false') === 'true';
+    if (includeDesc) {
+      const ids = await resolveCategoryDescendantIds(catId);
+      q = q.in('category_id', ids);
+    } else {
+      q = q.eq('category_id', catId);
+    }
+  }
 
   // mode: 'pro' → business listings (org-scoped)
   //       'marketplace' → C2C listings (no org)
@@ -74,16 +92,22 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json(toProduct(data, data.owner));
 }));
 
-// GET /api/products/:id/similar — same category, exclude the product itself
+// GET /api/products/:id/similar — same category, exclude the product itself.
+// Prefer category_id matching when available; fall back to the legacy
+// text category only when the source has no category_id set.
 router.get('/:id/similar', asyncHandler(async (req, res) => {
   const { data: source } = await supabase
-    .from('products').select('id,category').eq('id', req.params.id).maybeSingle();
+    .from('products').select('id,category,category_id').eq('id', req.params.id).maybeSingle();
   if (!source) return res.json([]);
 
-  const { data } = await supabase
+  let q = supabase
     .from('products').select(SELECT_WITH_OWNER)
-    .eq('category', source.category).neq('id', source.id).eq('sold', false)
-    .order('created_at', { ascending: false }).limit(6);
+    .neq('id', source.id).eq('sold', false);
+
+  if (source.category_id) q = q.eq('category_id', source.category_id);
+  else                    q = q.eq('category', source.category);
+
+  const { data } = await q.order('created_at', { ascending: false }).limit(6);
   res.json((data ?? []).map(row => toProduct(row, row.owner)));
 }));
 
@@ -99,6 +123,7 @@ router.post('/', requireAuth, asyncHandler(async (req, res) => {
       description: body.description,
       price: body.price,
       category: body.category,
+      category_id: body.categoryId ?? null,
       condition: body.condition ?? null,
       image_url: body.imageUrl,
       image_urls: body.imageUrls ?? [],
@@ -126,6 +151,7 @@ router.put('/:id', requireAuth, asyncHandler(async (req, res) => {
       description: body.description,
       price: body.price,
       category: body.category,
+      category_id: body.categoryId ?? null,
       condition: body.condition ?? null,
       image_url: body.imageUrl,
       image_urls: body.imageUrls ?? [],

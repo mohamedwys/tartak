@@ -74,6 +74,33 @@
       </ng-container>
     </nav>
   </div>
+
+  <!-- Pro-mode category bar: 14 top-level categories + overflow "More ▾".
+       Hidden entirely in Marketplace mode. -->
+  <nav *ngIf="currentMode() === 'pro' && topCategories.length > 0"
+       class="category-bar" aria-label="Browse categories">
+    <div class="category-bar-inner">
+      <a *ngFor="let c of visibleTopCategories" [routerLink]="['/c', c.slug]"
+         class="cat-link" routerLinkActive="active">{{ c.name }}</a>
+
+      <div *ngIf="overflowTopCategories.length > 0" class="more-menu"
+           (click)="$event.stopPropagation()">
+        <button type="button" class="cat-link cat-more"
+                (click)="toggleMoreMenu($event)"
+                [attr.aria-expanded]="moreMenuOpen">
+          More
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="more-dropdown" *ngIf="moreMenuOpen">
+          <a *ngFor="let c of overflowTopCategories" [routerLink]="['/c', c.slug]"
+             class="more-item" (click)="closeMoreMenu()">{{ c.name }}</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <main class="app-main">
