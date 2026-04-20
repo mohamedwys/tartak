@@ -1,5 +1,5 @@
 -- =====================================================================
--- Qwiksell initial schema — Supabase (Postgres)
+-- Tartak initial schema — Supabase (Postgres)
 -- Replaces prior MongoDB model. UUID primary keys, snake_case columns.
 -- =====================================================================
 

@@ -35,6 +35,13 @@ router.get('/', asyncHandler(async (req, res) => {
   if (req.query.condition) q = q.eq('condition', String(req.query.condition));
   if (req.query.minPrice)  q = q.gte('price', Number(req.query.minPrice));
   if (req.query.maxPrice)  q = q.lte('price', Number(req.query.maxPrice));
+
+  // mode: 'pro' → business listings (org-scoped)
+  //       'marketplace' → C2C listings (no org)
+  //       'all' (default) → no filter, preserves legacy behavior
+  const mode = String(req.query.mode ?? 'all');
+  if (mode === 'pro')         q = q.not('org_id', 'is', null);
+  else if (mode === 'marketplace') q = q.is('org_id', null);
   if (req.query.q) {
     const term = String(req.query.q).replace(/[%,()]/g, ' ');
     q = q.or(`name.ilike.%${term}%,description.ilike.%${term}%`);

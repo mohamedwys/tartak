@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
+import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
   selector: 'app-add-product',
@@ -57,7 +58,19 @@ export class AddProductComponent {
     };
     if (this.condition) product.condition = this.condition;
     this.productService.createProduct(product).subscribe({
-      next: () => { this.router.navigate(['/']); },
+      next: () => {
+        // Backend derives org_id from the user's current JWT claim, so we
+        // route + toast by the same signal here.
+        const payload = decodeJwtPayload<{ currentOrgId?: string | null }>(localStorage.getItem('token'));
+        const isPro = !!payload?.currentOrgId;
+        if (isPro) {
+          this.toastService.success('Listing posted to Pro catalog');
+          this.router.navigate(['/dashboard/catalog']);
+        } else {
+          this.toastService.success('Listing posted to Marketplace');
+          this.router.navigate(['/marketplace']);
+        }
+      },
       error: (err: any) => {
         this.toastService.error(err.error?.message ?? 'Failed to add product.');
         this.submitting = false;

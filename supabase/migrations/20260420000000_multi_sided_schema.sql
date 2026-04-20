@@ -1,5 +1,5 @@
 -- =====================================================================
--- Qwiksell — multi-sided marketplace schema (additive migration)
+-- Tartak — multi-sided marketplace schema (additive migration)
 -- Orgs, storefronts, variants, categories, locations, moderation, analytics.
 --
 -- /* MIGRATION NOTES */

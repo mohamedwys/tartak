@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { AuthService } from '../../services/auth.service';
 import { decodeJwtPayload } from '../../utils/jwt';
+
+export type ListingMode = 'pro' | 'marketplace';
 
 @Component({
   selector: 'app-product-list',
@@ -13,6 +15,7 @@ import { decodeJwtPayload } from '../../utils/jwt';
 export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('sentinel') sentinelRef!: ElementRef;
 
+  mode: ListingMode = 'pro';
   products: any[] = [];
   loading = true;
   loadingMore = false;
@@ -27,6 +30,7 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedCondition = '';
   minPrice = '';
   maxPrice = '';
+  location = '';
   sort = 'newest';
 
   categories = ['Electronics', 'Furniture', 'Clothing', 'Sports', 'Music', 'Photography', 'Home & Garden'];
@@ -45,11 +49,19 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     private favoriteService: FavoriteService,
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
-    this.loadPage(1, true);
+    this.route.data.subscribe((data) => {
+      const incoming = (data['mode'] as ListingMode) ?? 'pro';
+      if (incoming !== this.mode) {
+        this.mode = incoming;
+        this.resetFiltersForMode();
+      }
+      this.loadPage(1, true);
+    });
     if (this.isLoggedIn) {
       this.favoriteService.getFavoriteIds().subscribe({
         next: (ids) => { this.favoriteIds = new Set(ids); },
@@ -72,11 +84,21 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     clearTimeout(this.filterTimer);
   }
 
+  private resetFiltersForMode(): void {
+    // Drop mode-specific filters when switching so stale values don't bleed
+    // across (e.g. condition set in Marketplace shouldn't follow to Pro).
+    this.selectedCondition = '';
+    this.location = '';
+  }
+
+  isMarketplace(): boolean { return this.mode === 'marketplace'; }
+  isPro(): boolean { return this.mode === 'pro'; }
+
   private buildParams(page: number): Record<string, string | number> {
     const p: Record<string, string | number> = { page, limit: 20, sort: this.sort };
     if (this.searchQuery)      p['q']         = this.searchQuery;
     if (this.selectedCategory) p['category']  = this.selectedCategory;
-    if (this.selectedCondition) p['condition'] = this.selectedCondition;
+    if (this.isMarketplace() && this.selectedCondition) p['condition'] = this.selectedCondition;
     if (this.minPrice)         p['minPrice']  = this.minPrice;
     if (this.maxPrice)         p['maxPrice']  = this.maxPrice;
     return p;
@@ -86,9 +108,19 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     if (reset) { this.loading = true; this.products = []; }
     else { this.loadingMore = true; }
 
-    this.productService.getProducts(this.buildParams(page)).subscribe({
+    this.productService.getProducts(this.buildParams(page), this.mode).subscribe({
       next: (res) => {
-        this.products = reset ? res.products : [...this.products, ...res.products];
+        let items = res.products;
+        // Simple client-side `location` match; backend has no radius filter yet.
+        if (this.isMarketplace() && this.location.trim()) {
+          const needle = this.location.trim().toLowerCase();
+          items = items.filter((p: any) => {
+            const city = (p.location?.city ?? '').toLowerCase();
+            const country = (p.location?.country ?? '').toLowerCase();
+            return city.includes(needle) || country.includes(needle);
+          });
+        }
+        this.products = reset ? items : [...this.products, ...items];
         this.page  = res.page;
         this.pages = res.pages;
         this.loading = false;
@@ -108,7 +140,17 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadPage(1, true);
   }
 
+  selectCondition(cond: string): void {
+    this.selectedCondition = this.selectedCondition === cond ? '' : cond;
+    this.loadPage(1, true);
+  }
+
   openProduct(id: string): void { this.router.navigate(['/product', id]); }
+
+  openStorefront(slug: string, event: Event): void {
+    event.stopPropagation();
+    this.router.navigate(['/store', slug]);
+  }
 
   toggleFavorite(productId: string, event: Event): void {
     event.stopPropagation();
@@ -136,5 +178,36 @@ export class ProductListComponent implements OnInit, OnDestroy, AfterViewInit {
   canDeleteProduct(product: any): boolean {
     const payload = decodeJwtPayload<{ id?: string }>(localStorage.getItem('token'));
     return !!payload && product.ownerId === payload.id;
+  }
+
+  locationLabel(product: any): string {
+    const city = product?.location?.city?.trim();
+    const country = product?.location?.country?.trim();
+    if (city && country) return `${city}, ${country}`;
+    if (country) return country;
+    if (city) return city;
+    return 'Location not set';
+  }
+
+  sellerFirstName(product: any): string {
+    const name = product?.ownerId?.name || product?.owner?.name || '';
+    return name.split(' ')[0] || 'Seller';
+  }
+
+  orgName(product: any): string | null {
+    return product?.org?.name || product?.organization?.name || null;
+  }
+
+  orgSlug(product: any): string | null {
+    return product?.org?.slug || product?.organization?.slug || null;
+  }
+
+  pricingMode(product: any): string {
+    return product?.pricingMode || product?.pricing_mode || 'fixed';
+  }
+
+  displayPrice(product: any): string | null {
+    if (this.pricingMode(product) === 'offer') return 'Make offer';
+    return null;
   }
 }

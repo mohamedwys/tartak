@@ -7,6 +7,7 @@ import { OfferService } from '../../services/offer.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ReportService } from '../../services/report.service';
+import { CartService } from '../../services/cart.service';
 import { decodeJwtPayload } from '../../utils/jwt';
 
 @Component({
@@ -85,7 +86,27 @@ export class ProductDetailComponent implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private reportService: ReportService,
+    private cartService: CartService,
   ) {}
+
+  // Pro products have an org_id → part of a business catalog.
+  // Marketplace products are individual (C2C) listings.
+  isProProduct(): boolean { return !!this.product?.org?._id || !!this.product?.org?.id || !!this.product?.orgId; }
+  isMarketplaceProduct(): boolean { return !!this.product && !this.isProProduct(); }
+
+  modeLabel(): string { return this.isProProduct() ? 'Pro' : 'Marketplace'; }
+  modePath(): string { return this.isProProduct() ? '/' : '/marketplace'; }
+
+  addToCart(): void {
+    if (!this.product) return;
+    this.cartService.addItem({
+      _id: this.product._id,
+      name: this.product.name,
+      price: this.product.price,
+      imageUrl: this.product.imageUrl,
+    });
+    this.toastService.success('Added to cart');
+  }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();

@@ -1,9 +1,9 @@
 {
-  "name": "qwiksell-server",
+  "name": "tartak-server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Supabase-backed Express API for the Qwiksell marketplace frontend.",
+  "description": "Supabase-backed Express API for the Tartak marketplace frontend.",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

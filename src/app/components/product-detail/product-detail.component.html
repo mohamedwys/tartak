@@ -1,8 +1,17 @@
 <div class="detail-page">
 
+  <!-- Breadcrumb -->
+  <nav *ngIf="!loading && product" class="detail-breadcrumb" aria-label="Breadcrumb">
+    <a [routerLink]="modePath()" class="crumb">{{ modeLabel() }}</a>
+    <span class="crumb-sep" aria-hidden="true">›</span>
+    <span class="crumb">{{ product.category }}</span>
+    <span class="crumb-sep" aria-hidden="true">›</span>
+    <span class="crumb crumb-current">{{ product.name }}</span>
+  </nav>
+
   <!-- Back nav -->
   <div class="detail-nav">
-    <a routerLink="/" class="back-link">
+    <a [routerLink]="product ? modePath() : '/'" class="back-link">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"/>
@@ -145,6 +154,9 @@
           <!-- Buttons row -->
           <div *ngIf="!showMessageForm && !showOfferForm && !messageSent"
             class="cta-row">
+            <button *ngIf="isProProduct()" class="btn-add-cart" (click)="addToCart()">
+              Add to cart
+            </button>
             <button class="btn-message" (click)="openMessage()">
               Message {{ sellerFirstName }}
             </button>

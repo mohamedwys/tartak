@@ -52,7 +52,7 @@ export class StorefrontComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     // Reset tags we set so they don't leak to other routes.
-    this.titleService.setTitle('Qwiksell');
+    this.titleService.setTitle('Tartak');
     this.meta.removeTag("name='description'");
     this.meta.removeTag("property='og:image'");
     this.meta.removeTag("property='og:title'");
@@ -83,13 +83,13 @@ export class StorefrontComponent implements OnInit, OnDestroy {
   }
 
   private applySeo(): void {
-    const name = this.org?.name ?? 'Qwiksell';
-    const title = this.storefront?.seo?.title || `${name} on Qwiksell`;
+    const name = this.org?.name ?? 'Tartak';
+    const title = this.storefront?.seo?.title || `${name} on Tartak`;
     this.titleService.setTitle(title);
 
     const description = this.storefront?.seo?.description
       || this.org?.bio
-      || `Browse listings from ${name} on Qwiksell.`;
+      || `Browse listings from ${name} on Tartak.`;
     this.meta.updateTag({ name: 'description', content: description });
     this.meta.updateTag({ property: 'og:title', content: title });
 

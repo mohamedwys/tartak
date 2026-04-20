@@ -1,6 +1,6 @@
-# Qwiksell API — Supabase edition
+# Tartak API — Supabase edition
 
-Express API powering the Qwiksell Angular frontend, backed by **Supabase
+Express API powering the Tartak Angular frontend, backed by **Supabase
 (Postgres + Storage)**. Replaces the previous MongoDB/Mongoose stack.
 
 ## Stack

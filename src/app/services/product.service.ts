@@ -14,9 +14,13 @@ export class ProductService {
     return { headers: new HttpHeaders({ Authorization: `Bearer ${token ?? ''}` }) };
   }
 
-  getProducts(params: Record<string, string | number> = {}): Observable<{ products: any[]; total: number; page: number; pages: number }> {
+  getProducts(
+    params: Record<string, string | number> = {},
+    mode: 'pro' | 'marketplace' | 'all' = 'all',
+  ): Observable<{ products: any[]; total: number; page: number; pages: number }> {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([k, v]) => { if (v !== '' && v !== null && v !== undefined) query.set(k, String(v)); });
+    if (mode !== 'all') query.set('mode', mode);
     const url = query.toString() ? `${this.apiUrl}?${query}` : this.apiUrl;
     return this.http.get<{ products: any[]; total: number; page: number; pages: number }>(url);
   }

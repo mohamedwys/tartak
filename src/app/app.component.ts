@@ -158,4 +158,9 @@ export class AppComponent implements OnInit {
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
+
+  // URL is the source of truth for marketplace mode — no localStorage.
+  currentMode(): 'pro' | 'marketplace' {
+    return this.router.url.startsWith('/marketplace') ? 'marketplace' : 'pro';
+  }
 }

@@ -68,5 +68,5 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(env.port, () => {
-  console.log(`[qwiksell-api] listening on :${env.port} (${env.nodeEnv})`);
+  console.log(`[tartak-api] listening on :${env.port} (${env.nodeEnv})`);
 });

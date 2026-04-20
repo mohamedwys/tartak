@@ -111,6 +111,37 @@
 }
 .btn-offer:hover { background: var(--brand-900); color: var(--text-inverse); }
 
+.btn-add-cart {
+  flex: 1 1 100%;
+  padding: var(--space-4);
+  background: var(--text-primary); color: var(--text-inverse);
+  border: 0; border-radius: var(--radius-md);
+  font-size: var(--text-base); font-weight: 700;
+  cursor: pointer; font-family: inherit; min-height: 48px;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+.btn-add-cart:hover { background: var(--brand-900); }
+
+.detail-breadcrumb {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-4) 0 0;
+  font-size: var(--text-sm); color: var(--text-muted);
+}
+.detail-breadcrumb .crumb {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.detail-breadcrumb a.crumb:hover { color: var(--text-primary); text-decoration: underline; }
+.detail-breadcrumb .crumb-current {
+  color: var(--text-primary);
+  font-weight: 500;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail-breadcrumb .crumb-sep { color: var(--text-muted); }
+
 /* Inline forms */
 .inline-form, .message-form {
   border: 1px solid var(--border); border-radius: var(--radius-lg);

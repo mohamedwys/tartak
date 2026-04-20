@@ -2,8 +2,17 @@
   <div class="header-inner">
     <a routerLink="/" class="brand">
       <div class="brand-mark"></div>
-      <span class="brand-name">TarTak</span>
+      <span class="brand-name">Tartak</span>
     </a>
+
+    <div class="mode-toggle" role="tablist" aria-label="Marketplace mode">
+      <a routerLink="/" class="mode-option" role="tab"
+        [attr.aria-selected]="currentMode() === 'pro'"
+        [class.active]="currentMode() === 'pro'">Pro</a>
+      <a routerLink="/marketplace" class="mode-option" role="tab"
+        [attr.aria-selected]="currentMode() === 'marketplace'"
+        [class.active]="currentMode() === 'marketplace'">Marketplace</a>
+    </div>
 
     <nav class="header-nav">
       <a routerLink="/" class="nav-link" routerLinkActive="active"

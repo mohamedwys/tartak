@@ -1,6 +1,6 @@
-# Tartak / Qwiksell
+# Tartak
 
-Monorepo for the Qwiksell marketplace.
+Monorepo for the Tartak marketplace.
 
 ```
 .

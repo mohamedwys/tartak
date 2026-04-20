@@ -89,6 +89,8 @@ export function toProduct(row, owner) {
   const orgRel = row.org && typeof row.org === 'object'
     ? { _id: row.org.id, name: row.org.name, slug: row.org.slug }
     : null;
+  const city = row.city ?? null;
+  const country = row.country ?? null;
   return {
     _id: row.id,
     name: row.name,
@@ -103,6 +105,9 @@ export function toProduct(row, owner) {
     orgId: row.org_id ?? null,
     org: orgRel,
     ownerId: owner ? toUserPublic(owner) : row.owner_id,
+    // Classifieds-side fields (nullable on Pro products).
+    pricingMode: row.pricing_mode ?? 'fixed',
+    location: (city || country) ? { city, country } : null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

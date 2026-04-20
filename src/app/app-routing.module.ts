@@ -18,7 +18,8 @@ import { StorefrontComponent } from './components/storefront/storefront.componen
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-  { path: '',                              component: ProductListComponent },
+  { path: '',                              component: ProductListComponent, data: { mode: 'pro' } },
+  { path: 'marketplace',                   component: ProductListComponent, data: { mode: 'marketplace' } },
   { path: 'product/:id',                   component: ProductDetailComponent },
   { path: 'login',                         component: LoginComponent },
   { path: 'register',                      component: RegisterComponent },
