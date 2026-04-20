@@ -435,6 +435,10 @@
 .category-bar {
   border-top: 1px solid var(--border-subtle);
   background: var(--surface-page);
+  /* Let the "More ▾" dropdown overflow below the bar. */
+  overflow: visible;
+  position: relative;
+  z-index: 20;
 }
 .category-bar-inner {
   max-width: var(--container-xl);
@@ -442,11 +446,12 @@
   padding: 0 var(--space-6);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-1);
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* overflow must stay visible so the "More ▾" dropdown can escape the bar.
+     Any overflow: auto|hidden on this container clips children on both axes. */
+  overflow: visible;
 }
-.category-bar-inner::-webkit-scrollbar { display: none; }
 
 .cat-link {
   display: inline-flex;
