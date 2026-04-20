@@ -31,6 +31,10 @@ const routes: Routes = [
   { path: 'forgot-password',               component: ForgotPasswordComponent },
   { path: 'reset-password/:token',         component: ResetPasswordComponent },
   { path: 'onboarding/business',           component: OnboardingBusinessComponent, canActivate: [AuthGuard] },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
+  },
 ];
 
 @NgModule({

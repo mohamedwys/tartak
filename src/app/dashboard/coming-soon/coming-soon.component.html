@@ -1,0 +1,11 @@
+<div class="soon-wrap">
+  <div class="soon-badge">Coming soon</div>
+  <h1 class="soon-title">{{ info.title }}</h1>
+  <p class="soon-desc">{{ info.description }}</p>
+  <ul class="soon-bullets" *ngIf="info.bullets.length">
+    <li *ngFor="let b of info.bullets">{{ b }}</li>
+  </ul>
+  <a *ngIf="info.externalLink" [routerLink]="info.externalLink.route" class="soon-link">
+    {{ info.externalLink.label }}
+  </a>
+</div>

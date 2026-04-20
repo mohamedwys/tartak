@@ -1,0 +1,39 @@
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <div class="dash-brand">
+      <a routerLink="/" class="dash-brand-link">TarTak</a>
+      <div class="dash-org" *ngIf="org">{{ org.name }}</div>
+      <div class="dash-org dash-org-muted" *ngIf="!org">Loading…</div>
+    </div>
+    <nav class="dash-nav">
+      <a *ngFor="let item of navItems"
+         [routerLink]="['/dashboard', item.route]"
+         routerLinkActive="active"
+         class="dash-nav-item"
+         [class.dash-nav-stub]="!item.implemented">
+        <span class="dash-nav-label">{{ item.label }}</span>
+        <span *ngIf="!item.implemented" class="dash-nav-soon">Soon</span>
+      </a>
+    </nav>
+    <div class="dash-sidebar-footer">
+      <a routerLink="/" class="dash-exit">← Back to marketplace</a>
+    </div>
+  </aside>
+
+  <div class="dash-main">
+    <header class="dash-topbar">
+      <div class="dash-topbar-left">
+        <div class="dash-topbar-title">{{ org?.name || 'Dashboard' }}</div>
+      </div>
+      <div class="dash-topbar-right">
+        <a routerLink="/" class="dash-topbar-link" title="Switch account">Switch account</a>
+        <a routerLink="/profile/edit" class="dash-avatar" [title]="myInitials">
+          {{ myInitials || '?' }}
+        </a>
+      </div>
+    </header>
+    <section class="dash-content">
+      <router-outlet></router-outlet>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DashboardRoutingModule } from './dashboard-routing.module';
+import { DashboardShellComponent } from './dashboard-shell/dashboard-shell.component';
+import { OverviewComponent } from './overview/overview.component';
+import { CatalogComponent } from './catalog/catalog.component';
+import { InquiriesComponent } from './inquiries/inquiries.component';
+import { ComingSoonComponent } from './coming-soon/coming-soon.component';
+import { TimeAgoPipe } from '../pipes/time-ago.pipe';
+
+@NgModule({
+  declarations: [
+    DashboardShellComponent,
+    OverviewComponent,
+    CatalogComponent,
+    InquiriesComponent,
+    ComingSoonComponent,
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DashboardRoutingModule,
+    TimeAgoPipe,
+  ],
+})
+export class DashboardModule {}

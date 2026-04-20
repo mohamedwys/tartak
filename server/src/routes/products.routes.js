@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { supabase } from '../config/supabase.js';
 import { requireAuth } from '../middleware/auth.js';
+import { roleAtLeast } from '../middleware/org.js';
 import { asyncHandler, HttpError } from '../utils/async.js';
 import { toProduct } from '../utils/mapping.js';
 
@@ -85,6 +86,7 @@ router.post('/', requireAuth, asyncHandler(async (req, res) => {
     .from('products')
     .insert({
       owner_id: req.user.id,
+      org_id: req.user.currentOrgId ?? null,
       name: body.name,
       description: body.description,
       price: body.price,
@@ -134,13 +136,67 @@ router.delete('/:id', requireAuth, asyncHandler(async (req, res) => {
   res.json({ success: true });
 }));
 
-// PATCH /api/products/:id/sold
-router.patch('/:id/sold', requireAuth, asyncHandler(async (req, res) => {
-  await assertOwnership(req.params.id, req.user.id);
-  const { data, error } = await supabase
-    .from('products').update({ sold: true }).eq('id', req.params.id)
-    .select(SELECT_WITH_OWNER).single();
+const statusSchema = z.object({
+  status: z.enum(['draft', 'active', 'paused', 'sold', 'removed']),
+});
+
+// Helper: caller must be the product owner OR an agent+ member of the
+// product's org. Returns the product row on success.
+async function assertStatusPermission(productId, user) {
+  const { data: row, error } = await supabase
+    .from('products')
+    .select('id, owner_id, org_id')
+    .eq('id', productId)
+    .maybeSingle();
   if (error) throw error;
+  if (!row) throw new HttpError(404, 'Product not found');
+
+  if (row.owner_id === user.id) return row;
+
+  if (row.org_id) {
+    const { data: membership } = await supabase
+      .from('org_members')
+      .select('role, accepted_at')
+      .eq('org_id', row.org_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+    if (membership?.accepted_at && roleAtLeast(membership.role, 'agent')) {
+      return row;
+    }
+  }
+  throw new HttpError(403, 'Not permitted to change this listing');
+}
+
+async function updateProductStatus(productId, status) {
+  const patch = { status };
+  // Keep the legacy boolean in sync so existing list filters that still
+  // consult `sold` behave correctly.
+  if (status === 'sold') patch.sold = true;
+  else patch.sold = false;
+
+  const { data, error } = await supabase
+    .from('products')
+    .update(patch)
+    .eq('id', productId)
+    .select(SELECT_WITH_OWNER)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// PATCH /api/products/:id/status — owner of product OR agent+ of org
+router.patch('/:id/status', requireAuth, asyncHandler(async (req, res) => {
+  const body = statusSchema.parse(req.body);
+  await assertStatusPermission(req.params.id, req.user);
+  const data = await updateProductStatus(req.params.id, body.status);
+  res.json(toProduct(data, data.owner));
+}));
+
+// PATCH /api/products/:id/sold — kept for back-compat; delegates to the
+// new status logic with status='sold' (and sold=true).
+router.patch('/:id/sold', requireAuth, asyncHandler(async (req, res) => {
+  await assertStatusPermission(req.params.id, req.user);
+  const data = await updateProductStatus(req.params.id, 'sold');
   res.json(toProduct(data, data.owner));
 }));
 

@@ -8,6 +8,9 @@ import { asyncHandler, HttpError } from '../utils/async.js';
 import {
   toOrganization,
   toOrgMember,
+  toProduct,
+  toMessage,
+  toOffer,
 } from '../utils/mapping.js';
 
 const router = Router();
@@ -451,6 +454,317 @@ router.get(
     if (error) throw error;
 
     res.json((data ?? []).map((row) => toOrgMember(row, row.user)));
+  }),
+);
+
+const PRODUCT_SELECT_WITH_OWNER =
+  '*, owner:users!products_owner_id_fkey(id,name,avatar_url,created_at)';
+
+// GET /api/orgs/:id/stats — dashboard overview KPIs + recent activity
+router.get(
+  '/:id/stats',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const orgId = req.params.id;
+
+    const [
+      activeListingsResult,
+      totalListingsResult,
+      productsForOrgResult,
+      recentListingsResult,
+    ] = await Promise.all([
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .eq('status', 'active'),
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId),
+      supabase.from('products').select('id').eq('org_id', orgId),
+      supabase
+        .from('products')
+        .select(PRODUCT_SELECT_WITH_OWNER)
+        .eq('org_id', orgId)
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
+
+    if (activeListingsResult.error)  throw activeListingsResult.error;
+    if (totalListingsResult.error)   throw totalListingsResult.error;
+    if (productsForOrgResult.error)  throw productsForOrgResult.error;
+    if (recentListingsResult.error)  throw recentListingsResult.error;
+
+    const productIds = (productsForOrgResult.data ?? []).map((p) => p.id);
+
+    let newInquiriesToday = 0;
+    let unansweredMessages = 0;
+    let recentMessages = [];
+
+    if (productIds.length > 0) {
+      const { data: memberRows } = await supabase
+        .from('org_members')
+        .select('user_id, accepted_at')
+        .eq('org_id', orgId);
+      const memberIds = (memberRows ?? [])
+        .filter((r) => r.accepted_at)
+        .map((r) => r.user_id);
+
+      const startOfDay = new Date();
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      const [inquiriesResult, unansweredResult, recentMessagesResult] = await Promise.all([
+        supabase
+          .from('messages')
+          .select('sender_id, product_id')
+          .in('product_id', productIds)
+          .gte('created_at', startOfDay.toISOString())
+          .in('recipient_id', memberIds.length ? memberIds : [orgId]),
+        supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .in('product_id', productIds)
+          .is('read_at', null)
+          .in('recipient_id', memberIds.length ? memberIds : [orgId]),
+        supabase
+          .from('messages')
+          .select(
+            '*, product:products(id,name,image_url,price,status), sender:users!messages_sender_id_fkey(id,name,avatar_url), recipient:users!messages_recipient_id_fkey(id,name,avatar_url)',
+          )
+          .in('product_id', productIds)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ]);
+
+      if (inquiriesResult.error)      throw inquiriesResult.error;
+      if (unansweredResult.error)     throw unansweredResult.error;
+      if (recentMessagesResult.error) throw recentMessagesResult.error;
+
+      const uniquePairs = new Set();
+      for (const row of inquiriesResult.data ?? []) {
+        uniquePairs.add(`${row.sender_id}:${row.product_id}`);
+      }
+      newInquiriesToday = uniquePairs.size;
+      unansweredMessages = unansweredResult.count ?? 0;
+      recentMessages = (recentMessagesResult.data ?? []).map((m) => ({
+        ...toMessage(m),
+        product: m.product
+          ? {
+              _id: m.product.id,
+              name: m.product.name,
+              imageUrl: m.product.image_url,
+              price: Number(m.product.price),
+              status: m.product.status ?? 'active',
+            }
+          : null,
+        sender: m.sender
+          ? { _id: m.sender.id, name: m.sender.name, avatarUrl: m.sender.avatar_url ?? null }
+          : null,
+        recipient: m.recipient
+          ? { _id: m.recipient.id, name: m.recipient.name, avatarUrl: m.recipient.avatar_url ?? null }
+          : null,
+      }));
+    }
+
+    res.json({
+      activeListings: activeListingsResult.count ?? 0,
+      totalListings: totalListingsResult.count ?? 0,
+      newInquiriesToday,
+      unansweredMessages,
+      recentListings: (recentListingsResult.data ?? []).map((row) => toProduct(row, row.owner)),
+      recentMessages,
+    });
+  }),
+);
+
+const orgProductsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  status: z.enum(['draft', 'active', 'paused', 'sold', 'removed']).optional(),
+  q: z.string().trim().max(200).optional(),
+  sort: z.enum(['newest', 'price_asc', 'price_desc']).default('newest'),
+  categoryId: z.string().uuid().optional(),
+});
+
+// GET /api/orgs/:id/products — paged listings scoped to the org
+router.get(
+  '/:id/products',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const parsed = orgProductsQuerySchema.parse({
+      page: req.query.page,
+      limit: req.query.limit,
+      status: req.query.status,
+      q: req.query.q,
+      sort: req.query.sort,
+      categoryId: req.query.category_id ?? req.query.categoryId,
+    });
+
+    const from = (parsed.page - 1) * parsed.limit;
+    const to = from + parsed.limit - 1;
+
+    let query = supabase
+      .from('products')
+      .select(PRODUCT_SELECT_WITH_OWNER, { count: 'exact' })
+      .eq('org_id', req.params.id);
+
+    if (parsed.status) query = query.eq('status', parsed.status);
+    if (parsed.categoryId) query = query.eq('category_id', parsed.categoryId);
+    if (parsed.q) {
+      const term = parsed.q.replace(/[%,()]/g, ' ');
+      query = query.or(`name.ilike.%${term}%,description.ilike.%${term}%`);
+    }
+
+    switch (parsed.sort) {
+      case 'price_asc':  query = query.order('price', { ascending: true }); break;
+      case 'price_desc': query = query.order('price', { ascending: false }); break;
+      case 'newest':
+      default:           query = query.order('updated_at', { ascending: false });
+    }
+
+    const { data, count, error } = await query.range(from, to);
+    if (error) throw error;
+
+    res.json({
+      products: (data ?? []).map((row) => toProduct(row, row.owner)),
+      total: count ?? 0,
+      page: parsed.page,
+      pages: count ? Math.max(1, Math.ceil(count / parsed.limit)) : 1,
+    });
+  }),
+);
+
+// GET /api/orgs/:id/inquiries — unified inbox across all products owned by
+// the org. Shape-compatible with /api/messages/inbox; adds pendingOffer.
+router.get(
+  '/:id/inquiries',
+  requireOrgRole('agent'),
+  asyncHandler(async (req, res) => {
+    const orgId = req.params.id;
+
+    const [{ data: productRows }, { data: memberRows }] = await Promise.all([
+      supabase.from('products').select('id').eq('org_id', orgId),
+      supabase
+        .from('org_members')
+        .select('user_id, accepted_at')
+        .eq('org_id', orgId),
+    ]);
+    const productIds = (productRows ?? []).map((p) => p.id);
+    const memberIds = (memberRows ?? [])
+      .filter((r) => r.accepted_at)
+      .map((r) => r.user_id);
+
+    if (productIds.length === 0 || memberIds.length === 0) {
+      return res.json([]);
+    }
+
+    const { data: msgs, error } = await supabase
+      .from('messages')
+      .select(
+        '*, product:products(id,name,image_url,price,status), sender:users!messages_sender_id_fkey(id,name,avatar_url), recipient:users!messages_recipient_id_fkey(id,name,avatar_url)',
+      )
+      .in('product_id', productIds)
+      .order('created_at', { ascending: false })
+      .limit(1000);
+    if (error) throw error;
+
+    const threads = new Map();
+    for (const m of msgs ?? []) {
+      // The buyer is whichever party is NOT a member of the org. We assume
+      // messages on org-owned listings are between an outside buyer and
+      // the org (any member acting as agent). If both sides appear to be
+      // members (unlikely), skip.
+      const senderIsMember = memberIds.includes(m.sender_id);
+      const recipientIsMember = memberIds.includes(m.recipient_id);
+      let buyer;
+      if (senderIsMember && !recipientIsMember) {
+        buyer = m.recipient;
+      } else if (!senderIsMember && recipientIsMember) {
+        buyer = m.sender;
+      } else {
+        continue;
+      }
+      if (!buyer) continue;
+
+      const key = `${buyer.id}:${m.product_id}`;
+      if (!threads.has(key)) {
+        threads.set(key, {
+          otherUser: {
+            _id: buyer.id,
+            name: buyer.name,
+            avatarUrl: buyer.avatar_url ?? null,
+          },
+          product: m.product
+            ? {
+                _id: m.product.id,
+                name: m.product.name,
+                imageUrl: m.product.image_url,
+                price: Number(m.product.price),
+                status: m.product.status ?? 'active',
+              }
+            : { _id: m.product_id, name: 'Listing', imageUrl: '', price: 0, status: 'active' },
+          lastMessage: {
+            content: m.content,
+            createdAt: m.created_at,
+            senderId: m.sender_id,
+            type: m.type,
+          },
+          unreadCount: 0,
+          pendingOffer: null,
+          _productId: m.product_id,
+          _buyerId: buyer.id,
+        });
+      }
+      const t = threads.get(key);
+      // Unread means: a member of this org received it and hasn't read it.
+      if (recipientIsMember && !m.read_at) t.unreadCount += 1;
+    }
+
+    const threadList = [...threads.values()];
+
+    // Attach the most recent pending offer per (buyer, product) pair.
+    if (threadList.length > 0) {
+      const { data: offerRows } = await supabase
+        .from('offers')
+        .select('*')
+        .in('product_id', threadList.map((t) => t._productId))
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (offerRows?.length) {
+        const byKey = new Map();
+        for (const o of offerRows) {
+          const key = `${o.buyer_id}:${o.product_id}`;
+          if (!byKey.has(key)) byKey.set(key, o);
+        }
+        for (const t of threadList) {
+          const o = byKey.get(`${t._buyerId}:${t._productId}`);
+          if (o) {
+            const offer = toOffer(o);
+            t.pendingOffer = { _id: offer._id, amount: offer.amount, status: offer.status };
+          }
+        }
+      }
+    }
+
+    threadList.sort((a, b) => {
+      const aUnread = a.unreadCount > 0 ? 1 : 0;
+      const bUnread = b.unreadCount > 0 ? 1 : 0;
+      if (aUnread !== bUnread) return bUnread - aUnread;
+      return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
+    });
+
+    // Strip internal fields and cap.
+    res.json(
+      threadList.slice(0, 200).map((t) => ({
+        otherUser: t.otherUser,
+        product: t.product,
+        lastMessage: t.lastMessage,
+        unreadCount: t.unreadCount,
+        pendingOffer: t.pendingOffer,
+      })),
+    );
   }),
 );
 

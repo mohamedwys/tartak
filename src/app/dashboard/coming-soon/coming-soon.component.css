@@ -1,0 +1,46 @@
+.soon-wrap {
+  max-width: 640px;
+  margin: 40px auto;
+  background: #fff;
+  border: 1px solid #e3e7ee;
+  border-radius: 10px;
+  padding: 32px;
+  text-align: left;
+}
+.soon-badge {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  background: #edf1f8;
+  color: #4b587a;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.soon-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #1b2332;
+}
+.soon-desc {
+  color: #48536a;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+.soon-bullets {
+  color: #48536a;
+  font-size: 14px;
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+.soon-bullets li { margin: 4px 0; }
+.soon-link {
+  display: inline-block;
+  color: #2f5bb7;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+.soon-link:hover { text-decoration: underline; }

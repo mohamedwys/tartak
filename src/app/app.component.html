@@ -10,6 +10,8 @@
         [routerLinkActiveOptions]="{exact:true}">Browse</a>
 
       <ng-container *ngIf="isLoggedIn()">
+        <a *ngIf="currentOrgId" routerLink="/dashboard/overview" class="nav-link"
+           routerLinkActive="active">Open dashboard</a>
         <a routerLink="/inbox" class="nav-link nav-inbox" routerLinkActive="active">
           Inbox
           <span *ngIf="unreadCount > 0" class="inbox-badge">{{ unreadCount }}</span>

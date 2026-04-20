@@ -87,6 +87,8 @@ export function toProduct(row, owner) {
     imageUrl: row.image_url,
     imageUrls: row.image_urls ?? [],
     sold: row.sold,
+    status: row.status ?? 'active',
+    orgId: row.org_id ?? null,
     ownerId: owner ? toUserPublic(owner) : row.owner_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

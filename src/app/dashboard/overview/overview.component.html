@@ -1,0 +1,70 @@
+<div class="ov-wrap">
+  <header class="ov-header">
+    <h1 class="ov-title">Overview</h1>
+    <p class="ov-subtitle">A snapshot of today's activity across your listings.</p>
+  </header>
+
+  <div *ngIf="loading" class="ov-status">Loading…</div>
+  <div *ngIf="error" class="ov-status ov-status-error">{{ error }}</div>
+
+  <ng-container *ngIf="stats && !loading">
+    <div class="ov-kpi-grid">
+      <div class="ov-kpi">
+        <div class="ov-kpi-label">Active listings</div>
+        <div class="ov-kpi-value">{{ stats.activeListings }}</div>
+      </div>
+      <div class="ov-kpi">
+        <div class="ov-kpi-label">Total listings</div>
+        <div class="ov-kpi-value">{{ stats.totalListings }}</div>
+      </div>
+      <div class="ov-kpi">
+        <div class="ov-kpi-label">Inquiries today</div>
+        <div class="ov-kpi-value">{{ stats.newInquiriesToday }}</div>
+      </div>
+      <div class="ov-kpi">
+        <div class="ov-kpi-label">Unanswered messages</div>
+        <div class="ov-kpi-value">{{ stats.unansweredMessages }}</div>
+      </div>
+    </div>
+
+    <div class="ov-panels">
+      <section class="ov-panel">
+        <header class="ov-panel-header">
+          <h2>Recent listings</h2>
+          <a routerLink="/dashboard/catalog" class="ov-panel-link">View all →</a>
+        </header>
+        <div *ngIf="!stats.recentListings.length" class="ov-empty">No listings yet.</div>
+        <ul class="ov-list" *ngIf="stats.recentListings.length">
+          <li *ngFor="let p of stats.recentListings" class="ov-list-item" (click)="openListing()">
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" class="ov-thumb" />
+            <div *ngIf="!p.imageUrl" class="ov-thumb ov-thumb-placeholder"></div>
+            <div class="ov-item-main">
+              <div class="ov-item-title">{{ p.name }}</div>
+              <div class="ov-item-meta">{{ p.price | currency:'USD':'symbol':'1.0-0' }}</div>
+            </div>
+            <span class="ov-chip" [attr.data-status]="p.status">{{ statusLabel(p.status) }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="ov-panel">
+        <header class="ov-panel-header">
+          <h2>Recent messages</h2>
+          <a routerLink="/dashboard/inquiries" class="ov-panel-link">View all →</a>
+        </header>
+        <div *ngIf="!stats.recentMessages.length" class="ov-empty">No messages yet.</div>
+        <ul class="ov-list" *ngIf="stats.recentMessages.length">
+          <li *ngFor="let m of stats.recentMessages" class="ov-list-item" (click)="openMessage(m)">
+            <img *ngIf="m.product?.imageUrl" [src]="m.product.imageUrl" [alt]="m.product.name" class="ov-thumb" />
+            <div *ngIf="!m.product?.imageUrl" class="ov-thumb ov-thumb-placeholder"></div>
+            <div class="ov-item-main">
+              <div class="ov-item-title">{{ m.sender?.name || 'Buyer' }}</div>
+              <div class="ov-item-meta">{{ m.product?.name }} · {{ m.content }}</div>
+            </div>
+            <span class="ov-time">{{ m.createdAt | timeAgo }}</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </ng-container>
+</div>

@@ -43,9 +43,8 @@ import { AuthGuard } from './guards/auth.guard';
     OnboardingBusinessComponent,
     ToastComponent,
     ImageUploadComponent,
-    TimeAgoPipe,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe],
   providers: [AuthGuard],
   bootstrap: [AppComponent]
 })

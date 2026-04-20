@@ -1,0 +1,55 @@
+<div class="inq-wrap">
+  <header class="inq-header">
+    <h1 class="inq-title">Inquiries</h1>
+    <p class="inq-subtitle">Every buyer conversation across your listings, in one place.</p>
+  </header>
+
+  <div class="inq-filters">
+    <button type="button" class="inq-filter" [class.active]="filter === 'all'"
+      (click)="setFilter('all')">All</button>
+    <button type="button" class="inq-filter" [class.active]="filter === 'unread'"
+      (click)="setFilter('unread')">Unread</button>
+    <button type="button" class="inq-filter" [class.active]="filter === 'offers'"
+      (click)="setFilter('offers')">With pending offers</button>
+  </div>
+
+  <div *ngIf="loading" class="inq-status">Loading…</div>
+  <div *ngIf="error" class="inq-status inq-status-error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && !visibleThreads.length" class="inq-empty">
+    <div class="inq-empty-title">No inquiries yet</div>
+    <p>Once buyers reach out about your listings, their threads show up here.</p>
+  </div>
+
+  <ul class="inq-list" *ngIf="!loading && visibleThreads.length">
+    <li *ngFor="let t of visibleThreads; trackBy: trackByThread"
+        class="inq-row" [class.inq-row-unread]="t.unreadCount > 0"
+        (click)="open(t)">
+      <img *ngIf="t.product.imageUrl" [src]="t.product.imageUrl" [alt]="t.product.name" class="inq-thumb" />
+      <div *ngIf="!t.product.imageUrl" class="inq-thumb inq-thumb-placeholder"></div>
+
+      <div class="inq-main">
+        <div class="inq-row-top">
+          <div class="inq-buyer">
+            <div class="inq-avatar" *ngIf="!t.otherUser.avatarUrl">{{ initials(t.otherUser.name) }}</div>
+            <img *ngIf="t.otherUser.avatarUrl" [src]="t.otherUser.avatarUrl" [alt]="t.otherUser.name" class="inq-avatar-img" />
+            <span class="inq-buyer-name">{{ t.otherUser.name }}</span>
+            <span class="inq-product">· {{ t.product.name }}</span>
+          </div>
+          <span class="inq-time">{{ t.lastMessage.createdAt | timeAgo }}</span>
+        </div>
+
+        <div class="inq-preview">{{ t.lastMessage.content }}</div>
+      </div>
+
+      <div class="inq-badges">
+        <span *ngIf="t.pendingOffer" class="inq-badge inq-badge-offer">
+          Offer {{ t.pendingOffer.amount | currency:'USD':'symbol':'1.0-0' }}
+        </span>
+        <span *ngIf="t.unreadCount > 0" class="inq-badge inq-badge-unread">
+          {{ t.unreadCount }} new
+        </span>
+      </div>
+    </li>
+  </ul>
+</div>

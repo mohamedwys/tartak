@@ -1,0 +1,95 @@
+<div class="cat-wrap" (click)="closeMenus()">
+  <header class="cat-header">
+    <div>
+      <h1 class="cat-title">Catalog</h1>
+      <p class="cat-subtitle">Manage every listing owned by this organization.</p>
+    </div>
+    <button class="cat-primary" type="button" (click)="createListing()">
+      + Create listing
+    </button>
+  </header>
+
+  <div class="cat-toolbar">
+    <input
+      class="cat-input"
+      type="search"
+      placeholder="Search listings…"
+      [ngModel]="q"
+      (ngModelChange)="onSearchChange($event)"
+    />
+    <select class="cat-select" [(ngModel)]="status" (change)="onFilterChange()">
+      <option value="">All statuses</option>
+      <option *ngFor="let s of statusOptions" [value]="s">{{ statusLabel(s) }}</option>
+    </select>
+    <select class="cat-select" [(ngModel)]="sort" (change)="onFilterChange()">
+      <option value="newest">Recently updated</option>
+      <option value="price_asc">Price ↑</option>
+      <option value="price_desc">Price ↓</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="cat-status">Loading…</div>
+  <div *ngIf="error" class="cat-status cat-status-error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && !products.length" class="cat-empty">
+    <div class="cat-empty-title">No listings yet</div>
+    <p>Create your first listing to start reaching buyers.</p>
+    <button class="cat-primary" type="button" (click)="createListing()">+ Create listing</button>
+  </div>
+
+  <div *ngIf="!loading && products.length" class="cat-table-wrap">
+    <table class="cat-table">
+      <thead>
+        <tr>
+          <th class="cat-col-image"></th>
+          <th>Name</th>
+          <th class="cat-col-price">Price</th>
+          <th class="cat-col-status">Status</th>
+          <th class="cat-col-updated">Updated</th>
+          <th class="cat-col-actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products; trackBy: trackById">
+          <td class="cat-col-image">
+            <img *ngIf="p.imageUrl" [src]="p.imageUrl" [alt]="p.name" class="cat-thumb" />
+            <div *ngIf="!p.imageUrl" class="cat-thumb cat-thumb-placeholder"></div>
+          </td>
+          <td class="cat-cell-name">
+            <div class="cat-name">{{ p.name }}</div>
+            <div class="cat-category">{{ p.category }}</div>
+          </td>
+          <td class="cat-col-price">{{ p.price | currency:'USD':'symbol':'1.0-2' }}</td>
+          <td class="cat-col-status">
+            <div class="cat-status-picker" (click)="$event.stopPropagation()">
+              <button type="button" class="cat-chip" [attr.data-status]="p.status"
+                (click)="toggleMenu(p._id, $event)">
+                {{ statusLabel(p.status) }}
+                <span class="cat-chevron">▾</span>
+              </button>
+              <div class="cat-menu" *ngIf="openMenuId === p._id">
+                <button *ngFor="let s of statusOptions" type="button" class="cat-menu-item"
+                  [class.selected]="p.status === s" (click)="changeStatus(p, s)">
+                  {{ statusLabel(s) }}
+                </button>
+              </div>
+            </div>
+          </td>
+          <td class="cat-col-updated">{{ p.updatedAt | timeAgo }}</td>
+          <td class="cat-col-actions">
+            <button type="button" class="cat-link" (click)="edit(p)">Edit</button>
+            <button type="button" class="cat-link cat-link-danger" (click)="remove(p)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="cat-pagination" *ngIf="pages > 1">
+      <button type="button" class="cat-page-btn" [disabled]="page <= 1"
+        (click)="page = page - 1; load()">← Prev</button>
+      <span class="cat-page-info">Page {{ page }} of {{ pages }} · {{ total }} total</span>
+      <button type="button" class="cat-page-btn" [disabled]="page >= pages"
+        (click)="page = page + 1; load()">Next →</button>
+    </div>
+  </div>
+</div>
