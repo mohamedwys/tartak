@@ -296,7 +296,7 @@ export class PlanComponent implements OnInit {
     return products[n - 1].id;
   }
 
-  busyEquals(token: 'upgrade' | 'portal' | `addon:${string}`): boolean {
+  busyEquals(token: string): boolean {
     return this.busy === token;
   }
 }
