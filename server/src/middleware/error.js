@@ -24,11 +24,11 @@ export function errorHandler(err, req, res, _next) {
   const status = Number.isInteger(err?.status) ? err.status : 500;
   const clientMessage =
     status >= 500
-      ? 'Internal server error'
+      ? (isProd ? 'Internal server error' : (err?.message ?? 'Internal server error'))
       : (err?.message ?? 'Request failed');
 
   const body = { ...baseBody(req), message: clientMessage };
-  if (err?.extra && status < 500) body.extra = err.extra;
+  if (err?.extra && (status < 500 || !isProd)) body.extra = err.extra;
 
   if (!isProd && err?.stack) body.stack = err.stack;
 
