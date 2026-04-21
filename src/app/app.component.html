@@ -2,18 +2,13 @@
 
 <header class="app-header" [class.scrolled]="scrolled">
   <div class="header-inner">
-    <a routerLink="/" class="brand" aria-label="Tartak home">
-      <svg class="brand-mark" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true">
-        <rect width="40" height="40" rx="9" fill="var(--navy-900)"/>
-        <g transform="translate(4,6)">
-          <polygon points="2,0 8,0 10,2 10,8 8,10 2,10 0,8 0,2" fill="var(--teal-500)"/>
-          <polygon points="16,0 17.5,3 21,2 19.5,5 22,7 19.5,9 21,12 17.5,11 16,14 14.5,11 11,12 12.5,9 10,7 12.5,5 11,2 14.5,3" fill="var(--ochre-500)"/>
-          <polygon points="24,0 30,0 32,2 32,8 30,10 24,10 22,8 22,2" fill="var(--terra-500)"/>
-        </g>
-        <rect x="17" y="16" width="6" height="20" fill="var(--cream-100)"/>
-        <polygon points="20,23 21.2,25 23.5,25 22,26.4 22.7,28.6 20,27.3 17.3,28.6 18,26.4 16.5,25 18.8,25" fill="var(--ochre-500)"/>
-      </svg>
-      <span class="brand-name">Tartak</span>
+    <a routerLink="/" class="auth-brand-lockup">
+      <img class="auth-brand-mark"
+          src="/tartak-logo.png"
+          srcset="/tartak-logo.png 1x, /tartak-logo@2x.png 2x"
+          width="120" height="120"
+          alt="Tartak">
+      <span class="auth-brand-name">Tartak</span>
     </a>
 
     <div class="mode-toggle" role="tablist" aria-label="Marketplace mode">
