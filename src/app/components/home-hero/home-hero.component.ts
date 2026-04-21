@@ -103,12 +103,16 @@ export class HomeHeroComponent implements OnInit, OnDestroy {
     if (banner.imageUrl) {
       return {
         'background-image':
-          `linear-gradient(180deg, rgba(26,26,26,0.1) 0%, rgba(26,26,26,0.5) 100%), url("${banner.imageUrl}")`,
+          `linear-gradient(120deg, rgba(14,35,64,0.32) 0%, rgba(14,35,64,0.72) 100%), url("${banner.imageUrl}")`,
         'background-size': 'cover',
         'background-position': 'center',
       };
     }
-    return { 'background-color': banner.bgColor ?? 'var(--brand-900)' };
+    return {
+      'background-color': banner.bgColor ?? 'var(--navy-900)',
+      'background-image':
+        'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%)',
+    };
   }
 
   trackById(_: number, b: Banner): string { return b._id; }

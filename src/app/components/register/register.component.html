@@ -1,35 +1,73 @@
-<div class="auth-page zellige-backdrop">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <div class="brand-dot"></div>
-      <span>Marketplace</span>
+<div class="auth-split">
+  <aside class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-inner">
+      <a routerLink="/" class="auth-brand-lockup">
+        <svg class="auth-brand-mark" viewBox="0 0 40 40" width="44" height="44">
+          <rect width="40" height="40" rx="9" fill="#ffffff"/>
+          <g transform="translate(4,6)">
+            <polygon points="2,0 8,0 10,2 10,8 8,10 2,10 0,8 0,2" fill="var(--teal-500)"/>
+            <polygon points="16,0 17.5,3 21,2 19.5,5 22,7 19.5,9 21,12 17.5,11 16,14 14.5,11 11,12 12.5,9 10,7 12.5,5 11,2 14.5,3" fill="var(--ochre-500)"/>
+            <polygon points="24,0 30,0 32,2 32,8 30,10 24,10 22,8 22,2" fill="var(--terra-500)"/>
+          </g>
+          <rect x="17" y="16" width="6" height="20" fill="var(--navy-900)"/>
+        </svg>
+        <span class="auth-brand-name">Tartak</span>
+      </a>
+
+      <h2 class="auth-tagline">Start selling across the continent today.</h2>
+      <p class="auth-sub-tagline">
+        Free to start. Reach buyers in every region. Ship locally, grow globally.
+      </p>
+
+      <figure class="auth-testimonial">
+        <blockquote>
+          “The onboarding took minutes and the support is real — a human replied to my first question.”
+        </blockquote>
+        <figcaption>
+          <span class="auth-testimonial-name">Kwame Mensah</span>
+          <span class="auth-testimonial-role">Founder · Ashanti Handcraft · Accra</span>
+        </figcaption>
+      </figure>
     </div>
-    <h1>Create an account</h1>
-    <p class="auth-sub">Join our marketplace today</p>
+  </aside>
 
-    <form (ngSubmit)="register()">
-      <div class="field">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" [(ngModel)]="name" name="name"
-          placeholder="Jane Smith" required autocomplete="name">
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" [(ngModel)]="email" name="email"
-          placeholder="you@example.com" required autocomplete="email">
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" [(ngModel)]="password" name="password"
-          placeholder="Min. 6 characters" required autocomplete="new-password">
-      </div>
-      <label class="biz-toggle">
-        <input type="checkbox" [(ngModel)]="isBusiness" name="isBusiness">
-        <span>I'm signing up as a business</span>
-      </label>
-      <button type="submit" class="btn-auth">Sign up</button>
-    </form>
+  <main class="auth-main">
+    <div class="auth-card">
+      <header class="auth-header">
+        <span class="t-eyebrow">Join Tartak</span>
+        <h1>Create an account</h1>
+        <p class="auth-sub">Free forever. Upgrade when you're ready.</p>
+      </header>
 
-    <p class="auth-switch">Already have an account? <a routerLink="/login">Log in</a></p>
-  </div>
+      <form (ngSubmit)="register()" class="auth-form" novalidate>
+        <div class="field">
+          <label class="label" for="name">Full name</label>
+          <input class="input" type="text" id="name" [(ngModel)]="name" name="name"
+            placeholder="Jane Smith" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input class="input" type="email" id="email" [(ngModel)]="email" name="email"
+            placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input class="input" type="password" id="password" [(ngModel)]="password" name="password"
+            placeholder="Minimum 6 characters" required autocomplete="new-password">
+        </div>
+        <label class="biz-toggle">
+          <input type="checkbox" [(ngModel)]="isBusiness" name="isBusiness">
+          <span class="biz-check" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6l2.5 2.5L10 3" stroke="currentColor" stroke-width="1.8"/>
+            </svg>
+          </span>
+          <span>I'm signing up as a business</span>
+        </label>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Create account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a routerLink="/login">Log in</a></p>
+    </div>
+  </main>
 </div>

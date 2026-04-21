@@ -1,40 +1,73 @@
-<div class="auth-page zellige-backdrop">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <div class="brand-dot"></div>
-      <span>Marketplace</span>
+<div class="auth-split">
+  <aside class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-inner">
+      <a routerLink="/" class="auth-brand-lockup">
+        <svg class="auth-brand-mark" viewBox="0 0 40 40" width="44" height="44">
+          <rect width="40" height="40" rx="9" fill="#ffffff"/>
+          <g transform="translate(4,6)">
+            <polygon points="2,0 8,0 10,2 10,8 8,10 2,10 0,8 0,2" fill="var(--teal-500)"/>
+            <polygon points="16,0 17.5,3 21,2 19.5,5 22,7 19.5,9 21,12 17.5,11 16,14 14.5,11 11,12 12.5,9 10,7 12.5,5 11,2 14.5,3" fill="var(--ochre-500)"/>
+            <polygon points="24,0 30,0 32,2 32,8 30,10 24,10 22,8 22,2" fill="var(--terra-500)"/>
+          </g>
+          <rect x="17" y="16" width="6" height="20" fill="var(--navy-900)"/>
+        </svg>
+        <span class="auth-brand-name">Tartak</span>
+      </a>
+
+      <h2 class="auth-tagline">Our marketplace. Our continent.</h2>
+      <p class="auth-sub-tagline">
+        Join thousands of independent African businesses selling directly to buyers — no middlemen, no inflated fees.
+      </p>
+
+      <figure class="auth-testimonial">
+        <blockquote>
+          “We doubled our reach in three months. Tartak made it simple to list, sell, and grow.”
+        </blockquote>
+        <figcaption>
+          <span class="auth-testimonial-name">Fatima Diallo</span>
+          <span class="auth-testimonial-role">Founder · Baobab Textiles · Dakar</span>
+        </figcaption>
+      </figure>
     </div>
-    <h1>Welcome back</h1>
-    <p class="auth-sub">Log in to your account</p>
+  </aside>
 
-    <form (ngSubmit)="login()">
-      <div class="field">
-        <label for="email">Email</label>
-        <input type="email" id="email" [(ngModel)]="email" name="email"
-          placeholder="you@example.com" required autocomplete="email">
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" [(ngModel)]="password" name="password"
-          placeholder="••••••••" required autocomplete="current-password">
-      </div>
-      <button type="submit" class="btn-auth">Log in</button>
-    </form>
+  <main class="auth-main">
+    <div class="auth-card">
+      <header class="auth-header">
+        <span class="t-eyebrow">Welcome back</span>
+        <h1>Log in to Tartak</h1>
+        <p class="auth-sub">Continue where you left off.</p>
+      </header>
 
-    <div class="forgot-link">
-      <a routerLink="/forgot-password">Forgot password?</a>
+      <form (ngSubmit)="login()" class="auth-form" novalidate>
+        <div class="field">
+          <label class="label" for="email">Email</label>
+          <input class="input" type="email" id="email" [(ngModel)]="email" name="email"
+            placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <input class="input" type="password" id="password" [(ngModel)]="password" name="password"
+            placeholder="Your password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Log in</button>
+      </form>
+
+      <div class="forgot-link">
+        <a routerLink="/forgot-password">Forgot password?</a>
+      </div>
+
+      <p class="auth-switch">Don't have an account? <a routerLink="/register">Sign up</a></p>
+
+      <div class="demo-accounts">
+        <span class="demo-label">Try a demo account</span>
+        <div class="demo-btns">
+          <button type="button" class="btn btn-secondary btn-sm"
+            (click)="loginAsDemo('alex@demo.com', 'demo1234')">Alex Rivera</button>
+          <button type="button" class="btn btn-secondary btn-sm"
+            (click)="loginAsDemo('sam@demo.com', 'demo1234')">Sam Chen</button>
+        </div>
+      </div>
     </div>
-
-    <p class="auth-switch">Don't have an account? <a routerLink="/register">Sign up</a></p>
-
-    <div class="demo-accounts">
-      <span class="demo-label">Try a demo account</span>
-      <div class="demo-btns">
-        <button type="button" class="btn-demo"
-          (click)="loginAsDemo('alex@demo.com', 'demo1234')">Alex Rivera</button>
-        <button type="button" class="btn-demo"
-          (click)="loginAsDemo('sam@demo.com', 'demo1234')">Sam Chen</button>
-      </div>
-    </div>
-  </div>
+  </main>
 </div>

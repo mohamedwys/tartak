@@ -29,6 +29,8 @@ import { HomeFeaturedComponent } from './components/home-featured/home-featured.
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
 import { ImagePipe } from './pipes/image.pipe';
 import { AuthGuard } from './guards/auth.guard';
+import { RevealDirective } from './directives/reveal.directive';
+import { EmptyStateComponent } from './components/empty-state/empty-state.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +56,7 @@ import { AuthGuard } from './guards/auth.guard';
     HomeTilesComponent,
     HomeFeaturedComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImagePipe, ImageUploadComponent],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, HttpClientModule, CommonModule, TimeAgoPipe, ImagePipe, ImageUploadComponent, RevealDirective, EmptyStateComponent],
   providers: [AuthGuard],
   bootstrap: [AppComponent]
 })

@@ -1,4 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#FF6B35"/>
-  <path d="M18 2 L10 17 L16 17 L12 30 L22 15 L16 15 Z" fill="white"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Tartak zellige T — pan-African marketplace mark -->
+  <rect width="64" height="64" rx="12" fill="#1a365d"/>
+
+  <!-- Crossbar (top of T) -->
+  <g transform="translate(8,10)">
+    <polygon points="2,0 10,0 12,2 12,10 10,12 2,12 0,10 0,2" fill="#3d8a8a"/>
+    <polygon points="20,0 22,4 26,2 24,6 28,8 24,10 26,14 22,12 20,16 18,12 14,14 16,10 12,8 16,6 14,2 18,4"
+             fill="#d9a33a"/>
+    <polygon points="34,0 42,0 44,2 44,10 42,12 34,12 32,10 32,2" fill="#c25a3a"/>
+  </g>
+
+  <!-- Stem of T -->
+  <rect x="26" y="24" width="12" height="34" fill="#f6efdf"/>
+
+  <!-- Stem accent tile -->
+  <polygon points="32,34 34,37 37,37 35,39 36,42 32,40 28,42 29,39 27,37 30,37" fill="#d9a33a"/>
 </svg>

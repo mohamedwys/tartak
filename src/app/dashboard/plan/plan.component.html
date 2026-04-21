@@ -1,116 +1,181 @@
 <div class="plan-wrap">
-  <header class="plan-header">
+  <header class="plan-page-header">
+    <span class="t-eyebrow">Subscription</span>
     <h1 class="plan-title">Plan &amp; add-ons</h1>
     <p class="plan-subtitle">Your subscription, usage, and optional boosts for your listings.</p>
   </header>
 
-  <div *ngIf="loading" class="plan-status">Loading…</div>
+  <div *ngIf="loading" class="plan-status">
+    <div class="spinner" aria-hidden="true"></div>
+    Loading your plan…
+  </div>
   <div *ngIf="error" class="plan-status plan-status-error">{{ error }}</div>
 
   <ng-container *ngIf="current && !loading">
-    <!-- ── Current plan banner ───────────────────────────────── -->
-    <section class="plan-banner">
-      <div class="plan-banner-main">
-        <div class="plan-banner-eyebrow">Current plan</div>
-        <div class="plan-banner-title">
-          {{ current.plan.name }} · {{ planBlurb(current.plan) }}
-        </div>
-        <div class="plan-banner-meta">
-          Active since {{ current.subscription.startedAt | date:'mediumDate' }}
-          <ng-container *ngIf="current.subscription.currentPeriodEnd">
-            · renews {{ current.subscription.currentPeriodEnd | date:'mediumDate' }}
-          </ng-container>
-          <ng-container *ngIf="current.subscription.cancelAtPeriodEnd">
-            · cancels at period end
-          </ng-container>
+    <!-- ── Hero summary card — gradient navy ───────────────── -->
+    <section class="plan-hero">
+      <div class="plan-hero-main">
+        <span class="plan-hero-eyebrow">Current plan</span>
+        <h2 class="plan-hero-name">{{ current.plan.name }}</h2>
+        <div class="plan-hero-blurb">{{ planBlurb(current.plan) }}</div>
+        <div class="plan-hero-meta">
+          <span class="plan-hero-meta-item">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M2 6h12M5 2v2M11 2v2" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+            Active since {{ current.subscription.startedAt | date:'mediumDate' }}
+          </span>
+          <span class="plan-hero-meta-item" *ngIf="current.subscription.currentPeriodEnd">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M1.5 8a6.5 6.5 0 1 0 6.5-6.5M8 4v4l2.5 2.5" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+            Renews {{ current.subscription.currentPeriodEnd | date:'mediumDate' }}
+          </span>
+          <span class="plan-hero-meta-item" *ngIf="current.subscription.cancelAtPeriodEnd">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+            Cancels at period end
+          </span>
         </div>
       </div>
-      <div class="plan-banner-side">
-        <span class="plan-chip" [attr.data-status]="current.subscription.status">
+      <div class="plan-hero-side">
+        <span class="plan-status-pill" [attr.data-status]="current.subscription.status">
+          <span class="plan-status-dot" aria-hidden="true"></span>
           {{ current.subscription.status }}
         </span>
         <button
           *ngIf="canManageBilling"
           type="button"
-          class="plan-btn plan-btn-ghost plan-btn-inline"
+          class="btn btn-ghost plan-hero-manage"
           (click)="onManageBilling()"
           [disabled]="!!busy"
         >
           {{ busyEquals('portal') ? 'Opening…' : 'Manage billing' }}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M3 9l6-6M5 3h4v4" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
         </button>
       </div>
     </section>
 
     <!-- ── Usage meter ──────────────────────────────────────── -->
     <section class="plan-card plan-usage">
-      <div class="plan-card-header">
-        <h2>Listings usage</h2>
-      </div>
-      <ng-container *ngIf="current.usage.listingLimit != null; else unlimited">
-        <div class="plan-usage-count">
-          <strong>{{ current.usage.activeListings }}</strong> /
-          {{ current.usage.listingLimit }} active listings
+      <div class="plan-usage-header">
+        <div>
+          <span class="t-eyebrow">Listings usage</span>
+          <ng-container *ngIf="current.usage.listingLimit != null; else unlimitedHeader">
+            <div class="plan-usage-label">
+              <span class="plan-usage-number">{{ current.usage.activeListings }}</span>
+              <span class="plan-usage-divider">of</span>
+              <span class="plan-usage-number-muted">{{ current.usage.listingLimit }}</span>
+              <span class="plan-usage-suffix">active listings</span>
+            </div>
+          </ng-container>
+          <ng-template #unlimitedHeader>
+            <div class="plan-usage-label">
+              <span class="plan-usage-number">{{ current.usage.activeListings }}</span>
+              <span class="plan-usage-suffix">active listings</span>
+            </div>
+          </ng-template>
         </div>
-        <div class="plan-usage-bar" [attr.data-tier]="usageTier">
-          <div class="plan-usage-fill" [style.width.%]="usagePercent"></div>
+        <div class="plan-usage-percent" *ngIf="current.usage.listingLimit != null">
+          {{ usagePercent }}%
+        </div>
+      </div>
+      <ng-container *ngIf="current.usage.listingLimit != null; else unlimitedBar">
+        <div class="progress plan-usage-track">
+          <div class="progress-fill"
+               [class.is-mid]="usageTier === 'warn'"
+               [class.is-high]="usageTier === 'danger'"
+               [style.width.%]="usagePercent"></div>
         </div>
       </ng-container>
-      <ng-template #unlimited>
-        <div class="plan-usage-count">
-          <strong>{{ current.usage.activeListings }}</strong> active listings
+      <ng-template #unlimitedBar>
+        <div class="plan-usage-note">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M2 8l3 3 9-9" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          Unlimited listings on {{ current.plan.name }}.
         </div>
-        <div class="plan-usage-note">Unlimited listings on {{ current.plan.name }}.</div>
       </ng-template>
     </section>
 
     <!-- ── Plan comparison ─────────────────────────────────── -->
     <section class="plan-compare">
       <header class="plan-section-header">
-        <h2>Compare plans</h2>
+        <span class="t-eyebrow">Compare plans</span>
+        <h2>Choose what fits your business</h2>
       </header>
 
       <div class="plan-compare-grid">
-        <!-- Free -->
         <article
-          class="plan-card plan-compare-card"
-          [class.plan-compare-card-current]="currentPlanSlug === 'free'"
+          class="plan-compare-card"
+          [class.is-current]="currentPlanSlug === 'free'"
           *ngIf="freePlan"
         >
+          <span class="plan-compare-badge" *ngIf="currentPlanSlug === 'free'">Your plan</span>
           <header class="plan-compare-card-header">
             <div class="plan-compare-card-name">{{ freePlan.name }}</div>
-            <div class="plan-compare-card-price">{{ planBlurb(freePlan) }}</div>
+            <div class="plan-compare-card-price">
+              <span class="plan-price-figure">{{ planPrice(freePlan) }}</span>
+              <span class="plan-price-unit">forever</span>
+            </div>
+            <p class="plan-compare-card-tag">Start selling with the essentials.</p>
           </header>
           <ul class="plan-feature-list">
             <li *ngFor="let row of comparisonRows" class="plan-feature-row">
+              <svg class="plan-feature-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path *ngIf="featureValue(freePlan, row.key) !== 'Not included' && featureValue(freePlan, row.key) !== '—'"
+                      d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="1.8"/>
+                <path *ngIf="featureValue(freePlan, row.key) === 'Not included' || featureValue(freePlan, row.key) === '—'"
+                      d="M4 4l8 8M12 4L4 12" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
               <span class="plan-feature-label">{{ row.label }}</span>
               <span class="plan-feature-value">{{ featureValue(freePlan, row.key) }}</span>
             </li>
           </ul>
           <button
             type="button"
-            class="plan-btn plan-btn-ghost"
+            class="btn btn-secondary btn-block"
             [disabled]="true"
             [title]="currentPlanSlug === 'free' ? 'This is your current plan' : ''"
           >
-            {{ currentPlanSlug === 'free' ? 'Your plan' : 'Downgrade unavailable' }}
+            {{ currentPlanSlug === 'free' ? 'Your plan' : 'Free is automatic' }}
           </button>
-          <p class="plan-btn-help" *ngIf="currentPlanSlug !== 'free'">
-            Free is automatic — everyone starts here.
-          </p>
         </article>
 
-        <!-- Pro -->
         <article
-          class="plan-card plan-compare-card plan-compare-card-pro"
-          [class.plan-compare-card-current]="currentPlanSlug === 'pro'"
+          class="plan-compare-card plan-compare-card-pro"
+          [class.is-current]="currentPlanSlug === 'pro'"
           *ngIf="proPlan"
         >
+          <span class="plan-compare-badge plan-compare-badge-recommended"
+                *ngIf="currentPlanSlug !== 'pro'">Recommended</span>
+          <span class="plan-compare-badge" *ngIf="currentPlanSlug === 'pro'">Your plan</span>
           <header class="plan-compare-card-header">
-            <div class="plan-compare-card-name">{{ proPlan.name }}</div>
-            <div class="plan-compare-card-price">{{ planBlurb(proPlan) }}</div>
+            <div class="plan-compare-card-name">
+              {{ proPlan.name }}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="plan-compare-star">
+                <path d="M8 1l2.2 4.6L15 6.3l-3.5 3.4.9 4.8L8 12.2 3.6 14.5l.9-4.8L1 6.3l4.8-.7z"
+                      fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="plan-compare-card-price">
+              <span class="plan-price-figure">{{ planPrice(proPlan) }}</span>
+              <span class="plan-price-unit" *ngIf="proPlan.billingInterval === 'month'">per month</span>
+            </div>
+            <p class="plan-compare-card-tag">Unlimited listings, verified badge, priority support.</p>
           </header>
           <ul class="plan-feature-list">
             <li *ngFor="let row of comparisonRows" class="plan-feature-row">
+              <svg class="plan-feature-icon plan-feature-icon-yes" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path *ngIf="featureValue(proPlan, row.key) !== 'Not included' && featureValue(proPlan, row.key) !== '—'"
+                      d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="1.8"/>
+                <path *ngIf="featureValue(proPlan, row.key) === 'Not included' || featureValue(proPlan, row.key) === '—'"
+                      d="M4 4l8 8M12 4L4 12" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
               <span class="plan-feature-label">{{ row.label }}</span>
               <span class="plan-feature-value">{{ featureValue(proPlan, row.key) }}</span>
             </li>
@@ -118,22 +183,14 @@
           <button
             *ngIf="currentPlanSlug !== 'pro'; else proCurrentBtn"
             type="button"
-            class="plan-btn plan-btn-primary"
+            class="btn btn-warm btn-lg btn-block"
             [disabled]="!!busy"
             (click)="onUpgradeToPro()"
           >
-            {{ busyEquals('upgrade')
-              ? 'Redirecting…'
-              : 'Upgrade to Pro — ' + planBlurb(proPlan) }}
+            {{ busyEquals('upgrade') ? 'Redirecting…' : 'Upgrade to Pro' }}
           </button>
           <ng-template #proCurrentBtn>
-            <button
-              type="button"
-              class="plan-btn plan-btn-primary"
-              [disabled]="true"
-            >
-              Your plan
-            </button>
+            <button type="button" class="btn btn-primary btn-block" [disabled]="true">Your plan</button>
           </ng-template>
         </article>
       </div>
@@ -142,35 +199,43 @@
     <!-- ── Add-on services ─────────────────────────────────── -->
     <section class="plan-addons" *ngIf="addons.length">
       <header class="plan-section-header">
-        <h2>Boost your listing</h2>
-        <p>Optional paid placements and power-ups. Purchased add-ons stack on top of any plan.</p>
+        <span class="t-eyebrow">Boosts</span>
+        <h2>Stand out with add-ons</h2>
+        <p>Optional paid placements and power-ups. Stack on any plan.</p>
       </header>
 
       <div class="plan-addon-grid">
-        <article class="plan-card plan-addon-card" *ngFor="let addon of addons">
+        <article class="plan-addon-card" *ngFor="let addon of addons">
+          <div class="plan-addon-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 2l2.9 6.3 6.9.7-5.1 4.8 1.5 6.8L12 17.3 5.8 20.6l1.5-6.8L2.2 9l6.9-.7z"/>
+            </svg>
+          </div>
           <div class="plan-addon-name">{{ addon.name }}</div>
           <div class="plan-addon-price">{{ addonBlurb(addon) }}</div>
           <p class="plan-addon-desc" *ngIf="addon.description">{{ addon.description }}</p>
           <button
             type="button"
-            class="plan-btn plan-btn-secondary"
+            class="btn btn-secondary btn-block"
             [disabled]="isAddonDisabled(addon)"
             (click)="onAddAddon(addon)"
           >
             {{ busyEquals('addon:' + addon.slug) ? 'Redirecting…' : 'Add' }}
           </button>
-          <p class="plan-btn-help" *ngIf="addonDisabledHint(addon)">{{ addonDisabledHint(addon) }}</p>
+          <p class="plan-addon-hint" *ngIf="addonDisabledHint(addon)">{{ addonDisabledHint(addon) }}</p>
         </article>
       </div>
     </section>
 
     <!-- ── My active add-ons ───────────────────────────────── -->
     <section class="plan-card plan-my-addons" *ngIf="orgAddons.length">
-      <header class="plan-card-header">
-        <h2>My active add-ons</h2>
+      <header class="plan-section-header">
+        <span class="t-eyebrow">Active</span>
+        <h2>My add-ons</h2>
       </header>
       <ul class="plan-my-addons-list">
         <li *ngFor="let a of orgAddons" class="plan-my-addons-row">
+          <span class="plan-my-addons-dot" aria-hidden="true"></span>
           <span class="plan-my-addons-name">{{ addonNameForSlug(a.addonSlug) }}</span>
           <span class="plan-my-addons-meta">
             active

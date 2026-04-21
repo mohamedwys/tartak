@@ -13,15 +13,14 @@ import { decodeJwtPayload } from './utils/jwt';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'E-Commerce Site';
+  title = 'Tartak';
   unreadCount = 0;
   myId = '';
   myInitials = '';
   currentOrgId: string | null = null;
   myOrgs: Organization[] = [];
   accountMenuOpen = false;
-  // Top-nav category bar (Pro mode only). We split into a visible row of
-  // up to `visibleCategoryLimit` and an overflow "More ▾" dropdown.
+  scrolled = false;
   topCategories: CategoryNode[] = [];
   visibleCategoryLimit = 8;
   moreMenuOpen = false;
@@ -156,6 +155,16 @@ export class AppComponent implements OnInit {
   closeMenus(): void {
     this.accountMenuOpen = false;
     this.moreMenuOpen = false;
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.scrolled = window.scrollY > 8;
+  }
+
+  orgInitial(name: string | null | undefined): string {
+    if (!name) return '?';
+    return name.trim().charAt(0).toUpperCase() || '?';
   }
 
   switchTo(orgId: string | null): void {

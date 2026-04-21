@@ -1,22 +1,54 @@
 <div class="dash-shell">
   <aside class="dash-sidebar">
-    <div class="dash-brand">
-      <a routerLink="/" class="dash-brand-link">TarTak</a>
-      <div class="dash-org" *ngIf="org">{{ org.name }}</div>
-      <div class="dash-org dash-org-muted" *ngIf="!org">Loading…</div>
+    <div class="dash-sidebar-pattern" aria-hidden="true"></div>
+
+    <a routerLink="/" class="dash-brand-link" aria-label="Tartak home">
+      <svg class="dash-brand-mark" viewBox="0 0 40 40" width="32" height="32" aria-hidden="true">
+        <rect width="40" height="40" rx="9" fill="#ffffff"/>
+        <g transform="translate(4,6)">
+          <polygon points="2,0 8,0 10,2 10,8 8,10 2,10 0,8 0,2" fill="var(--teal-500)"/>
+          <polygon points="16,0 17.5,3 21,2 19.5,5 22,7 19.5,9 21,12 17.5,11 16,14 14.5,11 11,12 12.5,9 10,7 12.5,5 11,2 14.5,3" fill="var(--ochre-500)"/>
+          <polygon points="24,0 30,0 32,2 32,8 30,10 24,10 22,8 22,2" fill="var(--terra-500)"/>
+        </g>
+        <rect x="17" y="16" width="6" height="20" fill="var(--navy-900)"/>
+      </svg>
+      <span class="dash-brand-name">Tartak</span>
+    </a>
+
+    <div class="dash-org-badge" *ngIf="org">
+      <span class="dash-org-avatar" aria-hidden="true">{{ (org.name || '?')[0] }}</span>
+      <div class="dash-org-body">
+        <div class="dash-org-label">Current workspace</div>
+        <div class="dash-org-name">{{ org.name }}</div>
+      </div>
     </div>
-    <nav class="dash-nav">
+    <div class="dash-org-badge dash-org-badge-loading" *ngIf="!org" aria-hidden="true">
+      <span class="dash-org-avatar sk"></span>
+      <div class="dash-org-body">
+        <div class="sk sk-text" style="width: 70%"></div>
+        <div class="sk sk-text" style="width: 50%; margin-top: 6px"></div>
+      </div>
+    </div>
+
+    <nav class="dash-nav" aria-label="Dashboard">
       <a *ngFor="let item of navItems"
          [routerLink]="['/dashboard', item.route]"
          routerLinkActive="active"
          class="dash-nav-item"
          [class.dash-nav-stub]="!item.implemented">
+        <span class="dash-nav-dot" aria-hidden="true"></span>
         <span class="dash-nav-label">{{ item.label }}</span>
         <span *ngIf="!item.implemented" class="dash-nav-soon">Soon</span>
       </a>
     </nav>
+
     <div class="dash-sidebar-footer">
-      <a routerLink="/" class="dash-exit">← Back to marketplace</a>
+      <a routerLink="/" class="dash-exit">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M8 3L4 7l4 4M4 7h9" stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+        Back to marketplace
+      </a>
     </div>
   </aside>
 
@@ -26,8 +58,8 @@
         <div class="dash-topbar-title">{{ org?.name || 'Dashboard' }}</div>
       </div>
       <div class="dash-topbar-right">
-        <a routerLink="/" class="dash-topbar-link" title="Switch account">Switch account</a>
-        <a routerLink="/profile/edit" class="dash-avatar" [title]="myInitials">
+        <a routerLink="/" class="dash-topbar-link">Switch account</a>
+        <a routerLink="/profile/edit" class="dash-avatar" [title]="myInitials" aria-label="Edit profile">
           {{ myInitials || '?' }}
         </a>
       </div>
