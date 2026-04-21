@@ -1,6 +1,18 @@
-<section class="home-hero" aria-labelledby="home-hero-headline">
+<section class="home-hero" aria-labelledby="home-hero-headline" #hero>
   <!-- Layer 0: background gradient applied via .home-hero bg -->
-  <!-- Layers 1–3 (zellige field, orbs, grain) land in Step 12c -->
+
+  <!-- Layer 1A: large zellige tiles (teal-300), slow spin -->
+  <div class="zellige-layer zellige-layer-large" aria-hidden="true"></div>
+  <!-- Layer 1B: small zellige tiles (ochre-300), overlay blend — static (parallax in 12d) -->
+  <div class="zellige-layer zellige-layer-small" aria-hidden="true"></div>
+
+  <!-- Layer 2: three absolutely-positioned lighting orbs, blur 80px -->
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
+
+  <!-- Layer 3: film grain — inline SVG turbulence, overlay blend -->
+  <div class="grain" aria-hidden="true"></div>
 
   <!-- Layer 4: content -->
   <div class="hero-content">
