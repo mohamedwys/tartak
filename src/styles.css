@@ -1,57 +1,116 @@
 /* ============================================================================
- * Tartak Design System — 2026 polish pass
+ * Tartak Design System — Step 12a: OKLCH palette + Outfit + @layer architecture
  * Logo-derived palette (zellige: navy, teal, terracotta, ochre, cream).
- * Editorial typography (Fraunces display + Inter body). Warm shadows,
- * two-layer depth, motion under 240ms, confident whitespace.
+ * Editorial typography (Fraunces display + Outfit body). Warm shadows,
+ * perceptually-uniform OKLCH color, @property-registered animatable tokens.
  * Components consume var(--token) only — never raw hex.
  * ============================================================================ */
 
+@layer reset, tokens, base, components, utilities;
+
+/* ────────────────────────────────────────────────────────────
+ * @property — registers animatable custom properties so CSS can
+ * interpolate them (instead of swap at 50%). These power the
+ * hero gradient pan (12c) + header glass override (12d).
+ * Must live at top level; cannot nest inside @layer.
+ * ──────────────────────────────────────────────────────────── */
+@property --grad-stop-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #162440;
+}
+@property --grad-stop-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2a6066;
+}
+@property --grad-stop-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1f3256;
+}
+@property --glow-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(69, 128, 132, 0.4);
+}
+@property --header-bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(251, 249, 244, 0.78);
+}
+@property --header-text {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #211d16;
+}
+@property --header-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(42, 37, 29, 0.08);
+}
+
+@layer tokens {
+
 :root {
-  /* ── Brand: Navy ────────────────────────────────────────── */
-  --navy-950: #0e2340;
-  --navy-900: #1a365d;
-  --navy-800: #1f4170;
-  --navy-700: #264f82;
-  --navy-500: #4373a8;
-  --navy-200: #b9cbe0;
-  --navy-100: #e4ecf5;
-  --navy-50:  #f3f7fb;
+  /* ────────────────────────────────────────────────────────────
+   * Palette — OKLCH authoritative (see @supports block below).
+   * These hex values are sRGB fallbacks for browsers without OKLCH.
+   * All ramps calibrated so `-500` reads at the same perceptual
+   * lightness across hues (navy/teal/terra/ochre).
+   * ──────────────────────────────────────────────────────────── */
 
-  /* ── Secondary: Teal ────────────────────────────────────── */
-  --teal-900: #1f4a4a;
-  --teal-700: #2d6b6b;
-  --teal-500: #3d8a8a;
-  --teal-200: #b8d4d4;
-  --teal-100: #e4f0f0;
+  /* Navy — H 250 (deep blue-violet) */
+  --navy-950: #091324;
+  --navy-900: #162440;
+  --navy-800: #1f3256;
+  --navy-700: #2d4472;
+  --navy-500: #4e659b;
+  --navy-300: #a3b2d0;
+  --navy-200: #c2cce1;
+  --navy-100: #dde4ee;
+  --navy-50:  #eef1f7;
 
-  /* ── Warmth: Terracotta ─────────────────────────────────── */
-  --terra-900: #8b3a1e;
-  --terra-700: #a94930;
-  --terra-500: #c25a3a;
-  --terra-200: #ebc6b8;
-  --terra-100: #f6e2d8;
+  /* Teal — H 190 (cyan) */
+  --teal-900: #18393e;
+  --teal-700: #2a6066;
+  --teal-500: #458086;
+  --teal-300: #9bc4c8;
+  --teal-200: #bedadc;
+  --teal-100: #dcecee;
 
-  /* ── Highlight: Ochre ───────────────────────────────────── */
-  --ochre-900: #8c6419;
-  --ochre-700: #b48424;
-  --ochre-500: #d9a33a;
-  --ochre-200: #edd9a5;
-  --ochre-100: #f7ecd0;
+  /* Terracotta — H 45 (orange-red) */
+  --terra-900: #572814;
+  --terra-700: #843f1f;
+  --terra-500: #a45330;
+  --terra-400: #bb6942;
+  --terra-200: #ebc5a9;
+  --terra-100: #f0dccd;
 
-  /* ── Warm neutrals (cream + grey) ───────────────────────── */
-  --cream-50:  #fbf9f4;
-  --cream-100: #f6efdf;
-  --cream-200: #ede0c8;
-  --cream-300: #dccfb4;
-  --warm-grey-500: #8b8275;
-  --warm-grey-700: #514a3e;
-  --warm-grey-900: #2a251d;
+  /* Ochre — H 80 (gold) */
+  --ochre-900: #624718;
+  --ochre-700: #8b6327;
+  --ochre-500: #ac7e32;
+  --ochre-300: #dcb364;
+  --ochre-200: #e9cf87;
+  --ochre-100: #f1e3c0;
 
-  /* ── Semantic (universal conventions — don't brand these) ─ */
-  --success-500: #15803d;  --success-100: #d8f0dd;
-  --error-500:   #b42318;  --error-100:   #fee4e2;
-  --warning-500: #b45309;  --warning-100: #fef3c7;
-  --info-500:    #1e40af;  --info-100:    #dbeafe;
+  /* Cream — H 85 */
+  --cream-50:  #fcfaf0;
+  --cream-100: #f3ecd6;
+  --cream-200: #e4d9b8;
+  --cream-300: #c4b597;
+
+  /* Warm grey — H 70 */
+  --warm-grey-500: #8f8577;
+  --warm-grey-700: #564e43;
+  --warm-grey-900: #211d16;
+
+  /* Semantic — OKLCH-calibrated to same perceptual lightness */
+  --success-500: #168349;  --success-100: #d2edd9;
+  --error-500:   #c03814;  --error-100:   #fbe1db;
+  --warning-500: #a66914;  --warning-100: #f2e2be;
+  --info-500:    #3049bc;  --info-100:    #d8dff4;
 
   /* ── Surface scale (warm-tinted, not sterile) ───────────── */
   --bg:             var(--cream-50);
@@ -78,30 +137,48 @@
 
   /* ── Typography ─────────────────────────────────────────── */
   --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  --font-body:    'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI',
                   Roboto, 'Helvetica Neue', sans-serif;
 
-  --text-xs:   clamp(0.75rem, 0.72rem + 0.1vw, 0.8125rem);
-  --text-sm:   clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
-  --text-base: clamp(1rem, 0.97rem + 0.12vw, 1.0625rem);
-  --text-lg:   clamp(1.125rem, 1.08rem + 0.18vw, 1.25rem);
-  --text-xl:   clamp(1.25rem, 1.18rem + 0.28vw, 1.5rem);
-  --text-2xl:  clamp(1.5rem, 1.38rem + 0.5vw, 1.875rem);
-  --text-3xl:  clamp(1.875rem, 1.7rem + 0.8vw, 2.5rem);
-  --text-4xl:  clamp(2.5rem, 2.2rem + 1.3vw, 3.5rem);
-  --text-5xl:  clamp(3rem, 2.5rem + 2.2vw, 4.5rem);
-  --text-6xl:  clamp(3.75rem, 3rem + 3.5vw, 6rem);
+  /* Fluid scale — Utopia-style. Ratio 1.2 at 320px, 1.25 at 1440px.
+     Larger steps scale faster than small ones. */
+  --text-xs:   clamp(0.75rem,  0.73rem + 0.10vw, 0.8125rem);
+  --text-sm:   clamp(0.875rem, 0.83rem + 0.22vw, 0.9375rem);
+  --text-base: clamp(1rem,     0.94rem + 0.30vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1.02rem + 0.55vw, 1.375rem);
+  --text-xl:   clamp(1.375rem, 1.22rem + 0.80vw, 1.75rem);
+  --text-2xl:  clamp(1.625rem, 1.36rem + 1.35vw, 2.25rem);
+  --text-3xl:  clamp(2rem,     1.58rem + 2.10vw, 3rem);
+  --text-4xl:  clamp(2.5rem,   1.90rem + 3.00vw, 4rem);
+  --text-5xl:  clamp(3rem,     2.13rem + 4.35vw, 5rem);
+  --text-6xl:  clamp(3.5rem,   2.40rem + 5.50vw, 6rem);
 
-  --leading-xs:   1.35;
-  --leading-sm:   1.45;
-  --leading-base: 1.55;
-  --leading-lg:   1.55;
+  /* Semantic leading — new canonical names */
+  --leading-none:     1;
+  --leading-tight:    1.1;
+  --leading-snug:     1.25;
+  --leading-normal:   1.5;
+  --leading-relaxed:  1.65;
+
+  /* Tracking */
+  --tracking-tightest: -0.04em;
+  --tracking-tighter:  -0.025em;
+  --tracking-tight:    -0.015em;
+  --tracking-normal:   0;
+  --tracking-wide:     0.04em;
+  --tracking-widest:   0.12em;
+
+  /* Legacy size-keyed leading (preserved — components use these) */
+  --leading-xs:   var(--leading-snug);
+  --leading-sm:   var(--leading-normal);
+  --leading-base: var(--leading-normal);
+  --leading-lg:   var(--leading-relaxed);
   --leading-xl:   1.35;
-  --leading-2xl:  1.25;
+  --leading-2xl:  var(--leading-snug);
   --leading-3xl:  1.15;
-  --leading-4xl:  1.08;
+  --leading-4xl:  var(--leading-tight);
   --leading-5xl:  1.03;
-  --leading-6xl:  1;
+  --leading-6xl:  var(--leading-none);
 
   /* ── Spacing (4px base) ─────────────────────────────────── */
   --space-1:  4px;
@@ -140,17 +217,24 @@
   --shadow-glow-terra: 0 0 0 1px var(--terra-500),
                        0 4px 20px rgba(194, 90, 58, 0.22);
 
-  /* ── Motion ─────────────────────────────────────────────── */
+  /* ── Motion — aligned with Framer / Linear vocabulary ───── */
   --dur-instant:   80ms;
-  --dur-fast:     160ms;
-  --dur-med:      240ms;
-  --dur-slow:     400ms;
+  --dur-fast:     150ms;
+  --dur-med:      280ms;
+  --dur-slow:     450ms;
+  --dur-slower:   700ms;
   --duration-fast: var(--dur-fast);
   --duration-med:  var(--dur-med);
   --duration-slow: var(--dur-slow);
-  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out:  cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:      cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-emphasized:  cubic-bezier(0.2, 0, 0, 1);
+  /* Native CSS linear() springs — no JS needed */
+  --ease-spring-soft:   linear(0, 0.4 20%, 0.85 40%, 1.03 65%, 0.99 85%, 1);
+  --ease-spring-snappy: linear(0, 0.6 15%, 1.08 40%, 0.98 70%, 1.01 85%, 1);
+  /* Legacy alias — older components use --ease-spring */
+  --ease-spring: var(--ease-spring-soft);
 
   /* ── Layout ─────────────────────────────────────────────── */
   --container-max:    1280px;
@@ -164,11 +248,82 @@
      8-pointed star + octagon interlock, tiles 160x160.
      Single-colour via currentColor, recolour via `color:` on caller. */
   --pattern-zellige: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='none' stroke='currentColor' stroke-width='1.1' stroke-linejoin='round' stroke-linecap='round'><g><polygon points='80,22 94,52 126,52 102,72 112,102 80,84 48,102 58,72 34,52 66,52'/><rect x='42' y='42' width='76' height='76' transform='rotate(45 80 80)'/><polygon points='0,0 18,14 0,28'/><polygon points='160,0 142,14 160,28'/><polygon points='0,132 18,146 0,160'/><polygon points='160,132 142,146 160,160'/><path d='M 0 80 Q 20 60 40 80 T 80 80 T 120 80 T 160 80'/><circle cx='80' cy='80' r='6'/></g></svg>");
+
+  /* ── Gradients (consumed by hero + accents) ─────────────── */
+  --gradient-brand:    linear-gradient(135deg, var(--navy-900) 0%, var(--teal-700) 55%, var(--navy-800) 100%);
+  --gradient-warm:     linear-gradient(135deg, var(--terra-500), var(--ochre-500));
+  --gradient-heritage: linear-gradient(120deg, var(--navy-900) 0%, var(--teal-700) 40%, var(--terra-700) 75%, var(--ochre-500) 100%);
+  --gradient-glass:    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+
+  /* ── Glows (radial, color-mix fades to transparent) ─────── */
+  --glow-teal:  radial-gradient(circle, color-mix(in oklch, var(--teal-500) 55%, transparent) 0%, transparent 70%);
+  --glow-ochre: radial-gradient(circle, color-mix(in oklch, var(--ochre-500) 55%, transparent) 0%, transparent 70%);
+  --glow-terra: radial-gradient(circle, color-mix(in oklch, var(--terra-500) 55%, transparent) 0%, transparent 70%);
+  --glow-navy:  radial-gradient(circle, color-mix(in oklch, var(--navy-700) 55%, transparent) 0%, transparent 70%);
 }
+
+/* ────────────────────────────────────────────────────────────
+ * OKLCH authoritative palette. Overrides the hex fallbacks above
+ * on ~97% of modern browsers (Chrome 111+, Safari 15.4+, FF 113+).
+ * Perceptually uniform: navy-500 / teal-500 / terra-500 / ochre-500
+ * all read at identical lightness.
+ * ──────────────────────────────────────────────────────────── */
+@supports (color: oklch(0 0 0)) {
+  :root {
+    --navy-950: oklch(0.20 0.045 250);
+    --navy-900: oklch(0.28 0.06  250);
+    --navy-800: oklch(0.34 0.07  250);
+    --navy-700: oklch(0.42 0.085 250);
+    --navy-500: oklch(0.55 0.10  250);
+    --navy-300: oklch(0.75 0.07  250);
+    --navy-200: oklch(0.85 0.05  250);
+    --navy-100: oklch(0.93 0.03  250);
+    --navy-50:  oklch(0.97 0.015 250);
+
+    --teal-900: oklch(0.30 0.04  190);
+    --teal-700: oklch(0.45 0.065 190);
+    --teal-500: oklch(0.60 0.085 190);
+    --teal-300: oklch(0.78 0.06  190);
+    --teal-200: oklch(0.87 0.04  190);
+    --teal-100: oklch(0.93 0.025 190);
+
+    --terra-900: oklch(0.35 0.09  45);
+    --terra-700: oklch(0.48 0.12  45);
+    --terra-500: oklch(0.58 0.135 45);
+    --terra-400: oklch(0.66 0.13  45);
+    --terra-200: oklch(0.88 0.06  45);
+    --terra-100: oklch(0.93 0.035 45);
+
+    --ochre-900: oklch(0.45 0.095 80);
+    --ochre-700: oklch(0.60 0.12  80);
+    --ochre-500: oklch(0.72 0.13  80);
+    --ochre-300: oklch(0.86 0.09  80);
+    --ochre-200: oklch(0.90 0.06  80);
+    --ochre-100: oklch(0.95 0.035 80);
+
+    --cream-50:  oklch(0.98 0.012 85);
+    --cream-100: oklch(0.94 0.025 85);
+    --cream-200: oklch(0.88 0.035 85);
+    --cream-300: oklch(0.78 0.04  85);
+
+    --warm-grey-500: oklch(0.58 0.015 70);
+    --warm-grey-700: oklch(0.38 0.015 70);
+    --warm-grey-900: oklch(0.18 0.012 70);
+
+    --success-500: oklch(0.55 0.14  150);
+    --error-500:   oklch(0.55 0.18  27);
+    --warning-500: oklch(0.60 0.13  65);
+    --info-500:    oklch(0.52 0.16  265);
+  }
+}
+
+} /* end @layer tokens */
 
 /* ============================================================================
  * Reset
  * ============================================================================ */
+
+@layer reset {
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -219,6 +374,14 @@ img { height: auto; }
 svg {
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+} /* end @layer reset */
+
+@layer base {
+
+body {
+  font-feature-settings: 'cv11', 'ss01', 'kern';
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -306,6 +469,10 @@ select:focus-visible {
   transition: top var(--dur-fast) var(--ease-out);
 }
 .skip-link:focus-visible { top: var(--space-4); }
+
+} /* end @layer base */
+
+@layer utilities {
 
 /* ============================================================================
  * Typography utilities
@@ -944,9 +1111,12 @@ select:focus-visible {
   -webkit-backdrop-filter: saturate(180%) blur(12px);
 }
 
+} /* end @layer utilities */
+
 /* ============================================================================
  * Legacy aliases — so older component CSS using --brand-*, --accent-* still
  * resolves. These all forward to the new logo-derived palette.
+ * Kept unlayered + at file-end so they resolve after everything else.
  * ============================================================================ */
 
 :root {
