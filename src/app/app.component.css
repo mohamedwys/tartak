@@ -2,22 +2,64 @@
  * App shell — global glass header, category bar, account menu
  * ============================================================================ */
 
+/*
+ * Header: uses @property-registered tokens (declared in src/styles.css)
+ * so --header-bg / --header-text / --header-border interpolate smoothly
+ * over 280ms when the .over-hero class flips (Step 12d glass override).
+ */
 .app-header {
+  --header-bg:     rgba(251, 249, 244, 0.78);
+  --header-text:   var(--text-primary);
+  --header-border: transparent;
+
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(251, 249, 244, 0.78);
+  background: var(--header-bg);
+  color: var(--header-text);
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--dur-med) var(--ease-out),
-              background var(--dur-med) var(--ease-out),
-              box-shadow var(--dur-med) var(--ease-out);
+  border-bottom: 1px solid var(--header-border);
+  transition:
+    --header-bg var(--dur-med) var(--ease-out),
+    --header-text var(--dur-med) var(--ease-out),
+    --header-border var(--dur-med) var(--ease-out),
+    box-shadow var(--dur-med) var(--ease-out);
 }
 .app-header.scrolled {
-  background: rgba(251, 249, 244, 0.92);
-  border-bottom-color: var(--border-subtle);
+  --header-bg: rgba(251, 249, 244, 0.92);
+  --header-border: var(--border-subtle);
   box-shadow: var(--shadow-xs);
+}
+
+/* Dark-glass override while hero is in view. Child elements pick up
+ * --header-text via the cascade, and the mode-toggle gets a tinted
+ * glass of its own so it remains legible on the dark background. */
+.app-header.over-hero {
+  --header-bg: rgba(10, 29, 54, 0.55);
+  --header-text: #ffffff;
+  --header-border: rgba(255, 255, 255, 0.10);
+}
+.app-header.over-hero.scrolled {
+  --header-bg: rgba(10, 29, 54, 0.78);
+}
+.app-header.over-hero .brand,
+.app-header.over-hero .brand-name,
+.app-header.over-hero .nav-link,
+.app-header.over-hero .mode-option {
+  color: var(--header-text);
+  transition: color var(--dur-med) var(--ease-out);
+}
+.app-header.over-hero .nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.app-header.over-hero .mode-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.app-header.over-hero .mode-option.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 .header-inner {

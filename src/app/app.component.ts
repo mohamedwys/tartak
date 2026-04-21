@@ -1,4 +1,10 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
@@ -12,7 +18,7 @@ import { decodeJwtPayload } from './utils/jwt';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   title = 'Tartak';
   unreadCount = 0;
   myId = '';
@@ -21,10 +27,12 @@ export class AppComponent implements OnInit {
   myOrgs: Organization[] = [];
   accountMenuOpen = false;
   scrolled = false;
+  headerOverHero = false;
   topCategories: CategoryNode[] = [];
   visibleCategoryLimit = 8;
   moreMenuOpen = false;
   private onboardingCheckedFor = '';
+  private heroSentinelObserver?: IntersectionObserver;
 
   constructor(
     private authService: AuthService,
@@ -40,7 +48,12 @@ export class AppComponent implements OnInit {
     // Re-run on every navigation so login/logout switches pick up the new token
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.refresh());
+      .subscribe(() => {
+        this.refresh();
+        // Re-attach hero sentinel observer on navigation — the sentinel
+        // only exists on the home page. Small delay so the view renders.
+        setTimeout(() => this.attachHeroSentinelObserver(), 80);
+      });
 
     // Fetch the category tree once up front — cached by the service for
     // subsequent callers (category pages, product detail breadcrumb, etc.).
@@ -48,6 +61,43 @@ export class AppComponent implements OnInit {
       next: (tree) => { this.topCategories = tree ?? []; },
       error: () => { this.topCategories = []; },
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Initial attach — covers the first page load landing on '/'.
+    setTimeout(() => this.attachHeroSentinelObserver(), 80);
+  }
+
+  ngOnDestroy(): void {
+    this.heroSentinelObserver?.disconnect();
+    this.heroSentinelObserver = undefined;
+  }
+
+  /**
+   * Observe the hero sentinel (rendered at the bottom of the hero
+   * by app-home-hero). While the sentinel is in the viewport the
+   * header switches to dark-glass via the over-hero class.
+   * No scroll listener — IntersectionObserver only.
+   */
+  private attachHeroSentinelObserver(): void {
+    if (typeof IntersectionObserver === 'undefined') return;
+    this.heroSentinelObserver?.disconnect();
+
+    const sentinel = document.querySelector('[data-hero-sentinel]');
+    if (!sentinel) {
+      this.headerOverHero = false;
+      return;
+    }
+
+    this.heroSentinelObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          this.headerOverHero = entry.isIntersecting;
+        }
+      },
+      { threshold: 0 },
+    );
+    this.heroSentinelObserver.observe(sentinel);
   }
 
   get visibleTopCategories(): CategoryNode[] {
