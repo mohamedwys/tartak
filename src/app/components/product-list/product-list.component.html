@@ -1,7 +1,7 @@
 <div class="browse-page zellige-backdrop" [class.mode-pro]="isPro()" [class.mode-marketplace]="isMarketplace()">
 
-  <!-- Hero -->
-  <div class="browse-hero">
+  <!-- Hero (marketplace only — Pro uses the full-bleed app-home-hero below) -->
+  <div class="browse-hero" *ngIf="!isPro()">
     <div class="browse-hero-inner">
       <span class="hero-eyebrow" *ngIf="isPro()">Business sellers</span>
       <span class="hero-eyebrow" *ngIf="isMarketplace()">Classifieds from your neighbors</span>
@@ -24,12 +24,12 @@
     </div>
   </div>
 
-  <!-- Pro home composed surface: hero banner carousel, quick-access tile row,
+  <!-- Pro home composed surface: full-bleed editorial hero, quick-access tile row,
        and featured section. Hidden as soon as any filter narrows the grid
        (or the user scrolls past page 1) so the product grid takes focus. -->
   <ng-container *ngIf="showHomeModules()">
     <app-home-hero></app-home-hero>
-    <app-home-tiles></app-home-tiles>
+    <app-home-tiles id="home-tiles"></app-home-tiles>
     <app-home-featured></app-home-featured>
   </ng-container>
 
