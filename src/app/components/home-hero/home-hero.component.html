@@ -14,6 +14,43 @@
   <!-- Layer 3: film grain — inline SVG turbulence, overlay blend -->
   <div class="grain" aria-hidden="true"></div>
 
+  <!-- Floating product cards (desktop >1100px only) — decorative, aria-hidden.
+       Shows real Pro listings; falls back to skeleton placeholders while
+       loading or if the fetch fails. -->
+  <div class="floating-cards" aria-hidden="true">
+    <ng-container *ngIf="floatingLoading || floatingCards.length === 0">
+      <div class="float-card float-card-a is-skeleton">
+        <div class="float-card-img"></div>
+        <div class="float-card-meta">
+          <div class="sk-line sk-price"></div>
+          <div class="sk-line sk-name"></div>
+        </div>
+      </div>
+      <div class="float-card float-card-b is-skeleton">
+        <div class="float-card-img"></div>
+        <div class="float-card-meta">
+          <div class="sk-line sk-price"></div>
+          <div class="sk-line sk-name"></div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!floatingLoading && floatingCards.length > 0">
+      <div
+        *ngFor="let card of floatingCards; let i = index"
+        class="float-card"
+        [class.float-card-a]="i === 0"
+        [class.float-card-b]="i === 1">
+        <div
+          class="float-card-img"
+          [style.background-image]="card.imageUrl ? 'url(' + card.imageUrl + ')' : null"></div>
+        <div class="float-card-meta">
+          <div class="float-card-price">{{ card.priceLabel }}</div>
+          <div class="float-card-name">{{ card.name }}</div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
   <!-- Layer 4: content -->
   <div class="hero-content">
     <span class="eyebrow">

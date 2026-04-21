@@ -1,19 +1,31 @@
 import {
   Component,
+  OnInit,
   AfterViewInit,
   OnDestroy,
   ElementRef,
   ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProductService } from '../../services/product.service';
+
+interface FloatingCardVM {
+  imageUrl: string | null;
+  name: string;
+  priceLabel: string;
+}
 
 @Component({
   selector: 'app-home-hero',
   templateUrl: './home-hero.component.html',
   styleUrls: ['./home-hero.component.css'],
 })
-export class HomeHeroComponent implements AfterViewInit, OnDestroy {
+export class HomeHeroComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('hero', { static: true }) hero!: ElementRef<HTMLElement>;
+
+  /** Real Pro listings shown as decorative floating cards (desktop >1100px only). */
+  floatingCards: FloatingCardVM[] = [];
+  floatingLoading = true;
 
   private parallaxFrame = 0;
   private mousemoveHandler: ((e: MouseEvent) => void) | null = null;
@@ -21,7 +33,43 @@ export class HomeHeroComponent implements AfterViewInit, OnDestroy {
   private scrollObserver?: IntersectionObserver;
   private reducedMotion = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private productService: ProductService,
+  ) {}
+
+  ngOnInit(): void {
+    this.productService
+      .getProducts({ page: 1, limit: 2, sort: 'newest' }, 'pro')
+      .subscribe({
+        next: (res) => {
+          this.floatingCards = (res.products ?? []).slice(0, 2).map((p: any) => ({
+            imageUrl: p.imageUrl ?? null,
+            name: p.name ?? '',
+            priceLabel: this.formatPrice(p.price),
+          }));
+          this.floatingLoading = false;
+        },
+        error: () => {
+          this.floatingCards = [];
+          this.floatingLoading = false;
+        },
+      });
+  }
+
+  private formatPrice(n: unknown): string {
+    const num = typeof n === 'number' ? n : Number(n);
+    if (!Number.isFinite(num)) return '';
+    try {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'MAD',
+        maximumFractionDigits: 0,
+      }).format(num);
+    } catch {
+      return `MAD ${Math.round(num)}`;
+    }
+  }
 
   ngAfterViewInit(): void {
     if (typeof window === 'undefined') return;
