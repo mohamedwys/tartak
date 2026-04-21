@@ -43,24 +43,85 @@
 .app-header.over-hero.scrolled {
   --header-bg: rgba(10, 29, 54, 0.78);
 }
+/* Descendant color cascade while hero is in view. The HTML uses
+ * `.auth-brand-*` on the header (not `.brand-*`), so we target both
+ * sets — some legacy routes also render the shell with `.brand-*`. */
+.app-header.over-hero,
 .app-header.over-hero .brand,
 .app-header.over-hero .brand-name,
+.app-header.over-hero .auth-brand-lockup,
+.app-header.over-hero .auth-brand-name,
 .app-header.over-hero .nav-link,
-.app-header.over-hero .mode-option {
+.app-header.over-hero .mode-option,
+.app-header.over-hero .btn-account,
+.app-header.over-hero .account-label {
   color: var(--header-text);
   transition: color var(--dur-med) var(--ease-out);
 }
-.app-header.over-hero .nav-link:hover {
+
+/* Secondary text (nav-link when not hovered) dims to 72% white */
+.app-header.over-hero .nav-link {
+  color: rgba(255, 255, 255, 0.72);
+}
+.app-header.over-hero .nav-link:hover,
+.app-header.over-hero .nav-link.active {
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* Mode toggle pill: glass against the dark header */
 .app-header.over-hero .mode-toggle {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.18);
 }
+.app-header.over-hero .mode-option {
+  color: rgba(255, 255, 255, 0.72);
+}
+.app-header.over-hero .mode-option:hover { color: #ffffff; }
 .app-header.over-hero .mode-option.active {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* Account button (avatar pill + chevron) */
+.app-header.over-hero .btn-account {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.app-header.over-hero .btn-account:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.app-header.over-hero .account-avatar {
+  background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
 }
+
+/* Inbox badge stays warm so it reads as an alert */
+.app-header.over-hero .inbox-badge {
+  color: #ffffff;
+}
+
+/* Sell button keeps its terra fill — already legible on dark */
+
+/* Category bar — this was the gray strip in the screenshot. */
+.app-header.over-hero .category-bar {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+.app-header.over-hero .cat-link {
+  color: rgba(255, 255, 255, 0.68);
+}
+.app-header.over-hero .cat-link:hover,
+.app-header.over-hero .cat-link:focus-visible,
+.app-header.over-hero .cat-link.active {
+  color: #ffffff;
+}
+.app-header.over-hero .cat-link::after {
+  background: #ffffff;
+}
+
+/* Shared-space icons inside nav/account inherit currentColor from
+ * their containers — the cascade handles them automatically. */
 
 .header-inner {
   max-width: var(--container-wide);

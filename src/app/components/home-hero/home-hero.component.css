@@ -92,16 +92,21 @@
 }
 
 .zellige-layer-large {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240' fill='none' stroke='%239bc4c8' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round'><g><polygon points='120,30 140,75 192,78 154,110 170,164 120,134 70,164 86,110 48,78 100,75'/><rect x='60' y='60' width='120' height='120' transform='rotate(45 120 120)'/><circle cx='120' cy='120' r='10'/><path d='M0 120 Q 30 90 60 120 T 120 120 T 180 120 T 240 120'/><polygon points='0,0 28,22 0,44'/><polygon points='240,0 212,22 240,44'/><polygon points='0,196 28,218 0,240'/><polygon points='240,196 212,218 240,240'/></g></svg>");
+  /* Zellige-authentic: central 8-point khatam star + octagon frame
+   * + rotated inner square + filled center dot + 4 edge-midpoint
+   * stars that stitch with neighbouring tiles + diagonal linkers. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240' fill='none' stroke='%239bc4c8' stroke-width='1.2' stroke-linejoin='round' stroke-linecap='round'><g><polygon points='180,120 148,131 162,162 131,148 120,180 109,148 78,162 92,131 60,120 92,109 78,78 109,92 120,60 131,92 162,78 148,109'/><polygon points='120,80 160,120 120,160 80,120'/><polygon points='60,60 180,60 220,100 220,180 180,220 60,220 20,180 20,100'/><circle cx='120' cy='120' r='4' fill='%239bc4c8' stroke='none'/><polygon points='120,0 128,12 140,20 128,28 120,40 112,28 100,20 112,12'/><polygon points='120,200 128,212 140,220 128,228 120,240 112,228 100,220 112,212'/><polygon points='0,120 12,128 20,140 28,128 40,120 28,112 20,100 12,112'/><polygon points='200,120 212,128 220,140 228,128 240,120 228,112 220,100 212,112'/><path d='M40 40 L70 70 M200 40 L170 70 M40 200 L70 170 M200 200 L170 170'/></g></svg>");
   background-size: 240px 240px;
-  opacity: 0.08;
+  opacity: 0.10;
   animation: slow-spin 180s linear infinite;
 }
 
 .zellige-layer-small {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%23dcb364' stroke-width='1' stroke-linejoin='round' stroke-linecap='round'><g><polygon points='60,15 70,37 96,39 77,55 85,82 60,67 35,82 43,55 24,39 50,37'/><rect x='30' y='30' width='60' height='60' transform='rotate(45 60 60)'/><circle cx='60' cy='60' r='5'/><path d='M0 60 Q 15 45 30 60 T 60 60 T 90 60 T 120 60'/></g></svg>");
+  /* Micro-motif: 8-point star + inner diamond + filled center.
+   * Tiles at 120px so two tiles fit inside each large-layer star. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%23dcb364' stroke-width='0.9' stroke-linejoin='round' stroke-linecap='round'><g><polygon points='90,60 74,66 82,82 66,74 60,90 54,74 38,82 46,66 30,60 46,54 38,38 54,46 60,30 66,46 82,38 74,54'/><polygon points='60,42 78,60 60,78 42,60'/><circle cx='60' cy='60' r='3' fill='%23dcb364' stroke='none'/></g></svg>");
   background-size: 120px 120px;
-  opacity: 0.06;
+  opacity: 0.08;
   mix-blend-mode: overlay;
   /* Mouse parallax — consumes --mx/--my set by TS on .home-hero */
   translate: calc(var(--mx, 0) * 20px) calc(var(--my, 0) * 20px);

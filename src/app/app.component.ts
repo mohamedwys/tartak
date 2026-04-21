@@ -74,17 +74,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Observe the hero sentinel (rendered at the bottom of the hero
-   * by app-home-hero). While the sentinel is in the viewport the
-   * header switches to dark-glass via the over-hero class.
-   * No scroll listener — IntersectionObserver only.
+   * Watch the hero element and flip the header glass override on
+   * while any part of the hero is in the viewport. Re-attaches on
+   * every NavigationEnd — the hero only renders on the home route.
+   * No scroll listener; IntersectionObserver only.
    */
   private attachHeroSentinelObserver(): void {
     if (typeof IntersectionObserver === 'undefined') return;
     this.heroSentinelObserver?.disconnect();
 
-    const sentinel = document.querySelector('[data-hero-sentinel]');
-    if (!sentinel) {
+    const hero = document.querySelector('.home-hero');
+    if (!hero) {
       this.headerOverHero = false;
       return;
     }
@@ -97,7 +97,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       { threshold: 0 },
     );
-    this.heroSentinelObserver.observe(sentinel);
+    this.heroSentinelObserver.observe(hero);
   }
 
   get visibleTopCategories(): CategoryNode[] {
